@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartFeed | Mess Owner Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<style>
+/* ── TOKENS (Glassmorphism Deep Theme - Enhanced) ── */
+:root {
+  --bg-primary:    #022c22;
+  --bg-secondary:  rgba(6, 78, 59, 0.4);
+  --bg-card:       rgba(255, 255, 255, 0.08);
+  --bg-card-alt:   rgba(255, 255, 255, 0.04);
+  --surface:       rgba(255, 255, 255, 0.1);
+  --lime:          #4ade80;
+  --lime-hover:    #86efac;
+  --lime-muted:    rgba(74, 222, 128, 0.2);
+  --lime-border:   rgba(74, 222, 128, 0.4);
+  --white:         #ffffff;
+  --white-70:      rgba(255, 255, 255, 0.85);
+  --white-40:      rgba(255, 255, 255, 0.60);
+  --white-20:      rgba(255, 255, 255, 0.25);
+  --green-a:       #22c55e;
+  --clay:          #f59e0b;
+  --radius-sm:     10px;
+  --radius-md:     18px;
+  --radius-lg:     24px;
+  --radius-xl:     32px;
+  --r-sm: var(--radius-sm); --r-md: var(--radius-md); --r-lg: var(--radius-lg); --r-xl: var(--radius-xl);
+  --glass-blur:    blur(24px);
+  --glass-border:  1px solid rgba(255, 255, 255, 0.15);
+  --glass-border-t: 1px solid rgba(255, 255, 255, 0.35);
+  --glass-shadow:  inset 0 1px 1px rgba(255,255,255,0.2), 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --font-display:  'Google Sans Display', 'Roboto', sans-serif;
+  --font-body:     'Google Sans', 'Roboto', sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+@keyframes gradientMovement {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+body{
+  font-family:var(--font-body);
+  background:var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(5, 150, 105, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(13, 148, 136, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(132, 204, 22, 0.2) 0%, transparent 60%);
+  background-size: 150% 150%;
+  animation: gradientMovement 20s ease infinite;
+  color:var(--white);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:rgba(2, 44, 34, 0.4);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border-right:1px solid rgba(255, 255, 255, 0.15);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sb-logo{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-display);font-weight:700;font-size:1.1rem;
+  padding:20px 20px;border-bottom:1px solid var(--white-20);
+  text-decoration:none;color:var(--white);
+}
+.sb-logo .material-icons{color:var(--lime);}
+.sb-nav{padding:12px;flex:1;}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--r-sm);
+  color:var(--white-70);text-decoration:none;
+  font-size:0.88rem;font-weight:500;
+  transition:background 0.2s,color 0.2s;margin-bottom:2px;
+}
+.sb-item:hover,.sb-item.active{background:var(--white-20);color:var(--white);}
+.sb-item.active{color:var(--lime);}
+.sb-item .material-icons{font-size:1.1rem;}
+.sb-footer{
+  padding:16px 20px;border-top:1px solid var(--white-20);
+}
+.sb-owner-tag{font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-40);margin-bottom:4px;display:block;}
+.sb-owner-name{font-family:var(--font-display);font-weight:700;font-size:0.95rem;}
+
+/* ── MAIN ── */
+.main{flex:1;padding:32px;overflow-x:hidden;}
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+.app-section { display: none; animation: fadeIn 0.3s ease; }
+.app-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.page-header{margin-bottom:28px;}
+.page-header h1{
+  font-family:var(--font-display);
+  font-size:clamp(1.6rem,3vw,2.2rem);
+  font-weight:700;letter-spacing:-0.01em;margin-bottom:6px;
+}
+.page-header p{font-size:0.9rem;color:var(--white-70);}
+
+/* ── TOP STAT CARDS ── */
+.top-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.s-card{
+  background:var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius:var(--r-lg);padding:24px;
+}
+.s-card-label{
+  display:flex;align-items:center;gap:6px;
+  font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--white-70);margin-bottom:14px;
+}
+.s-card-label .material-icons{font-size:0.95rem;color:var(--lime);}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--lime);
+  animation:blink 1.5s ease-in-out infinite;margin-left:2px;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.25;}}
+.live-text{font-size:0.68rem;font-weight:700;color:var(--lime);letter-spacing:0.06em;}
+.s-num{
+  font-family:var(--font-display);font-size:2.4rem;font-weight:700;
+  line-height:1;margin-bottom:6px;
+}
+.s-denom{font-size:0.82rem;color:var(--white-70);}
+.s-bar-wrap{margin-top:14px;}
+.s-bar{height:4px;background:var(--white-20);border-radius:2px;overflow:hidden;}
+.s-bar-fill{height:100%;border-radius:2px;background:var(--lime);width:0%;transition:width 1.6s ease;}
+.s-bar-label{font-size:0.7rem;color:var(--white-40);margin-top:6px;}
+
+/* ── IMPACT CARD ── */
+.impact-card{
+  background:var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius:var(--r-lg);padding:24px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin-bottom:20px;
+}
+
+.impact-tag{
+  font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--lime);display:flex;align-items:center;gap:6px;margin-bottom:8px;
+}
+.impact-tag .material-icons{font-size:0.9rem;}
+.impact-num{
+  font-family:var(--font-display);font-size:3rem;font-weight:700;
+  color:var(--lime);line-height:1;
+}
+.impact-label{font-size:0.85rem;color:var(--white-70);margin-top:6px;}
+.impact-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--lime-muted);border:1px solid var(--lime-border);
+  color:var(--lime);padding:9px 18px;border-radius:var(--r-xl);
+  font-size:0.85rem;font-weight:600;cursor:pointer;text-decoration:none;
+  transition:background 0.2s;margin-top:14px;
+}
+.impact-btn:hover{background:rgba(181,242,60,0.18);}
+
+/* ── CHART + FEED ── */
+.mid-row{display:grid;grid-template-columns:1fr 310px;gap:16px;margin-bottom:20px;}
+.chart-card,.feed-card{
+  background:var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius:var(--r-lg);padding:24px;
+}
+.card-title{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:4px;}
+.card-sub{font-size:0.78rem;color:var(--white-70);margin-bottom:20px;}
+
+/* bar chart */
+.chart-area{display:flex;align-items:flex-end;gap:8px;height:140px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;}
+.bar-grp{display:flex;gap:3px;align-items:flex-end;width:100%;}
+.bar{flex:1;border-radius:3px 3px 0 0;transition:height 1.4s ease;}
+.bar.bk{background:rgba(181,242,60,0.55);}
+.bar.ln{background:var(--lime);}
+.bar-day-lbl{font-size:0.62rem;color:var(--white-40);font-weight:600;letter-spacing:0.04em;}
+.chart-legend{display:flex;gap:14px;margin-top:14px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--white-70);}
+.leg-dot{width:8px;height:8px;border-radius:2px;}
+
+/* live feed */
+.feed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.feed-live{display:flex;align-items:center;gap:5px;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;color:var(--lime);}
+.feed-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:240px;}
+.feed-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  background:rgba(241,248,238,0.03);
+  border:1px solid var(--white-20);border-radius:var(--r-md);
+  animation:slideIn 0.35s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.f-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--lime-border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:0.72rem;font-weight:700;color:var(--lime);
+  flex-shrink:0;
+}
+.f-info{flex:1;min-width:0;}
+.f-name{font-size:0.83rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.f-sub{font-size:0.68rem;color:var(--white-40);}
+.f-meal{
+  font-size:0.62rem;font-weight:700;letter-spacing:0.06em;
+  background:var(--lime-muted);color:var(--lime);
+  padding:3px 8px;border-radius:6px;white-space:nowrap;
+}
+
+/* ── TABLE ── */
+.table-card{
+  background:var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius:var(--r-lg);padding:24px;
+}
+.table-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-primary);border:1px solid var(--white-20);border-radius:var(--r-md);
+  padding:8px 12px;
+}
+.search-box input{
+  background:none;border:none;outline:none;
+  color:var(--white);font-family:var(--font-body);font-size:0.85rem;width:160px;
+}
+.search-box .material-icons{font-size:1rem;color:var(--white-40);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{
+  text-align:left;font-size:0.7rem;font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;color:var(--white-40);
+  padding:10px 16px;border-bottom:1px solid var(--white-20);
+}
+td{
+  padding:14px 16px;font-size:0.88rem;
+  border-bottom:1px solid rgba(241,248,238,0.05);
+}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(241,248,238,0.02);}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;}
+.badge-present{background:var(--lime-muted);color:var(--lime);}
+.badge-expected{background:rgba(212,132,90,0.12);color:var(--clay);}
+.meal-lbl{font-size:0.72rem;font-weight:700;letter-spacing:0.06em;color:var(--white-70);}
+.more-btn{color:var(--white-40);cursor:pointer;background:none;border:none;transition:color 0.2s;}
+.more-btn:hover{color:var(--white);}
+
+/* ── MOBILE TOP BAR ── */
+.mobile-topbar{
+  display:none;position:sticky;top:0;z-index:200;
+  background:rgba(2, 44, 34, 0.6);backdrop-filter:var(--glass-blur);
+  border-bottom:1px solid rgba(255, 255, 255, 0.15);
+  padding:0 20px;height:60px;
+  align-items:center;justify-content:space-between;
+}
+.mobile-topbar .logo{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:700;text-decoration:none;color:var(--white);}
+.mobile-topbar .logo .material-icons{color:var(--lime);}
+
+/* ── MOBILE TAB ── */
+.tab-bar{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:rgba(2, 44, 34, 0.6);backdrop-filter:var(--glass-blur);
+  border-top:1px solid rgba(255, 255, 255, 0.15);
+  padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:500;
+}
+.tab-bar-inner{display:flex;justify-content:space-around;}
+.tab-item{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  color:var(--white-40);text-decoration:none;
+  font-size:0.62rem;font-weight:500;padding:4px 14px;transition:color 0.2s;
+}
+.tab-item.active,.tab-item:hover{color:var(--lime);}
+.tab-item .material-icons{font-size:1.25rem;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .mobile-topbar{display:flex;}
+  .main{padding:20px 16px 100px;}
+  .mid-row{grid-template-columns:1fr;}
+  .top-stats{grid-template-columns:1fr;}
+  .impact-card{flex-direction:column;align-items:flex-start;}
+  .tab-bar{display:block;}
+}
+@media(max-width:600px){
+  th,td{padding:10px 10px;font-size:0.8rem;}
+  .search-box input{width:120px;}
+}
+</style>
+</head>
+<body>
+
+<!-- MOBILE TOP BAR -->
+<div class="mobile-topbar">
+  <a href="index.html" class="logo"><span class="material-icons">eco</span>SmartFeed</a>
+  <a href="dashboard-student.html" style="color:var(--white-70);font-size:0.85rem;text-decoration:none">Students Dashboard</a>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="index.html" class="sb-logo"><span class="material-icons">eco</span>SmartFeed</a>
+    <nav class="sb-nav">
+      <a href="#" onclick="switchSection('dashboard')" data-sec="dashboard" class="sb-item active"><span class="material-icons">dashboard</span>Dashboard</a>
+      <a href="#" onclick="switchSection('inventory')" data-sec="inventory" class="sb-item"><span class="material-icons">inventory_2</span>Inventory</a>
+      <a href="#" onclick="switchSection('analytics')" data-sec="analytics" class="sb-item"><span class="material-icons">analytics</span>Analytics</a>
+      <a href="#" onclick="switchSection('students')" data-sec="students" class="sb-item"><span class="material-icons">group</span>Students</a>
+      <a href="#" onclick="switchSection('notifications')" data-sec="notifications" class="sb-item"><span class="material-icons">notifications</span>Notifications</a>
+      <a href="#" onclick="switchSection('settings')" data-sec="settings" class="sb-item"><span class="material-icons">settings</span>Settings</a>
+      <div style="border-top:1px solid var(--white-20);margin:12px 0;"></div>
+      <a href="index.html" class="sb-item"><span class="material-icons">home</span>Back to Home</a>
+      <a href="dashboard-student.html" class="sb-item"><span class="material-icons">school</span>Students Dashboard</a>
+    </nav>
+    <div class="sb-footer">
+      <span class="sb-owner-tag">Mess Owner</span>
+      <div class="sb-owner-name">Chief Steward</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div id="section-dashboard" class="app-section active">
+    <!-- DASHBOARD SECTION -->
+    <div class="page-header">
+      <h1>Mess Overview</h1>
+      <p>Welcome back, Chief Steward. Here is your real-time impact and resource utilization for today.</p>
+    </div>
+
+    <!-- TOP STATS -->
+    <div class="top-stats">
+      <div class="s-card">
+        <div class="s-card-label">
+          <span class="material-icons">wb_twilight</span>
+          Breakfast <span class="live-dot"></span><span class="live-text">LIVE</span>
+        </div>
+        <div class="s-num" id="bNum">—</div>
+        <div class="s-denom">students confirmed</div>
+        <div class="s-bar-wrap">
+          <div class="s-bar"><div class="s-bar-fill" id="bFill"></div></div>
+          <div class="s-bar-label" id="bLbl"></div>
+        </div>
+      </div>
+      <div class="s-card">
+        <div class="s-card-label">
+          <span class="material-icons">sunny</span>
+          Lunch <span class="live-dot"></span><span class="live-text">LIVE</span>
+        </div>
+        <div class="s-num" id="lNum">—</div>
+        <div class="s-denom">students confirmed</div>
+        <div class="s-bar-wrap">
+          <div class="s-bar"><div class="s-bar-fill" id="lFill"></div></div>
+          <div class="s-bar-label" id="lLbl"></div>
+        </div>
+      </div>
+      <div class="s-card">
+        <div class="s-card-label">
+          <span class="material-icons">dark_mode</span>
+          Dinner <span class="live-dot"></span><span class="live-text">LIVE</span>
+        </div>
+        <div class="s-num" id="dNum">—</div>
+        <div class="s-denom">students confirmed</div>
+        <div class="s-bar-wrap">
+          <div class="s-bar"><div class="s-bar-fill" id="dFill"></div></div>
+          <div class="s-bar-label" id="dLbl"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPACT -->
+    <div class="impact-card">
+      <div class="impact-left">
+        <div class="impact-tag"><span class="material-icons">eco</span>Impact Total</div>
+        <div class="impact-num" id="impactNum">—</div>
+        <div class="impact-label">Estimated meals optimised this month</div>
+        <a href="#" class="impact-btn"><span class="material-icons" style="font-size:0.9rem">bar_chart</span>View Report</a>
+      </div>
+    </div>
+
+    <!-- CHART + FEED -->
+    <div class="mid-row">
+      <div class="chart-card">
+        <div class="card-title">This Week's Attendance Trends</div>
+        <div class="card-sub">Historical meal participation rates</div>
+        <div class="chart-area" id="chartArea"></div>
+        <div class="chart-legend">
+          <div class="leg-item"><div class="leg-dot" style="background:rgba(181,242,60,0.55)"></div>Breakfast</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--lime)"></div>Lunch</div>
+        </div>
+      </div>
+
+      <div class="feed-card">
+        <div class="feed-header">
+          <div class="card-title">Recent Activity</div>
+          <div class="feed-live"><span class="live-dot"></span>LIVE FEED</div>
+        </div>
+        <div class="feed-list" id="feedList"></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="card-title">Daily Log</div>
+          <div class="card-sub" style="margin-bottom:0">Today's attendance records</div>
+        </div>
+        <div class="search-box">
+          <span class="material-icons">search</span>
+          <input type="text" placeholder="Search students…"/>
+          <span class="material-icons">filter_list</span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Status</th>
+              <th>Check-in Time</th>
+              <th>Meal Type</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tBody"></tbody>
+        </table>
+      </div>
+    </div>
+    </div> <!-- END DASHBOARD SECTION -->
+
+    <!-- INVENTORY SECTION -->
+    <div id="section-inventory" class="app-section">
+      <div class="page-header glass-panel">
+        <h1>Inventory Management</h1>
+        <p>Current stock levels and requirements based on upcoming meals.</p>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">Stock Status</div>
+        </div>
+        <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Stock Available</th><th>Est. Usage (Next 3 Days)</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Rice (Basmati)</td><td>150 kg</td><td>80 kg</td><td><span class="badge badge-present" style="background:var(--lime-muted);color:var(--lime)">Optimal</span></td></tr>
+            <tr><td>Lentils (Toor Dal)</td><td>45 kg</td><td>35 kg</td><td><span class="badge badge-present" style="background:var(--lime-muted);color:var(--lime)">Optimal</span></td></tr>
+            <tr><td>Cooking Oil</td><td>15 L</td><td>20 L</td><td><span class="badge badge-expected" style="background:rgba(212,132,90,0.12);color:var(--clay)">Need to order</span></td></tr>
+            <tr><td>Wheat Flour</td><td>120 kg</td><td>90 kg</td><td><span class="badge badge-present" style="background:var(--lime-muted);color:var(--lime)">Optimal</span></td></tr>
+            <tr><td>Vegetables (Assorted)</td><td>30 kg</td><td>60 kg</td><td><span class="badge badge-expected" style="background:rgba(212,132,90,0.12);color:var(--clay)">Need to order</span></td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS SECTION -->
+    <div id="section-analytics" class="app-section">
+      <div class="page-header glass-panel">
+        <h1>Detailed Analytics</h1>
+        <p>Insights into mess attendance, food waste reduction, and savings.</p>
+      </div>
+      <div class="top-stats">
+        <div class="s-card">
+          <div class="s-card-label"><span class="material-icons">trending_down</span> Waste Reduction</div>
+          <div class="s-num">38%</div>
+          <div class="s-denom">Less food wasted vs last month</div>
+        </div>
+        <div class="s-card">
+          <div class="s-card-label"><span class="material-icons">savings</span> Savings (Estimated)</div>
+          <div class="s-num">₹14k</div>
+          <div class="s-denom">Saved on groceries this week</div>
+        </div>
+        <div class="s-card">
+          <div class="s-card-label"><span class="material-icons">done_all</span> Accuracy</div>
+          <div class="s-num">94%</div>
+          <div class="s-denom">Attendance prediction accuracy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENTS SECTION -->
+    <div id="section-students" class="app-section">
+      <div class="page-header glass-panel">
+        <h1>Student Directory</h1>
+        <p>Manage hostel residents and their mess subscriptions.</p>
+      </div>
+      <div class="table-card">
+        <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Student Name</th><th>Hostel/Room No.</th><th>Subscription Status</th></tr></thead>
+          <tbody>
+            <tr><td>Adarsh Kumar</td><td>Block A, 102</td><td><span style="color:var(--lime);font-weight:bold;">Active</span></td></tr>
+            <tr><td>Priya Sharma</td><td>Block B, 204</td><td><span style="color:var(--lime);font-weight:bold;">Active</span></td></tr>
+            <tr><td>Rahul Verma</td><td>Block A, 115</td><td><span style="color:var(--clay);font-weight:bold;">Paused</span></td></tr>
+            <tr><td>James Smith</td><td>Block C, 305</td><td><span style="color:var(--lime);font-weight:bold;">Active</span></td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS SECTION -->
+    <div id="section-notifications" class="app-section">
+      <div class="page-header glass-panel">
+        <h1>Notifications</h1>
+        <p>Alerts and updates regarding mess operations.</p>
+      </div>
+      <div class="table-card">
+        <div style="padding:16px; border-bottom:1px solid rgba(255, 255, 255, 0.15);">
+          <div style="color:var(--clay);font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:1rem">warning</span> Action Required</div>
+          <div style="color:var(--white-70)">Stock alert: Cooking oil is running low. Expected to run out by tomorrow evening.</div>
+        </div>
+        <div style="padding:16px; border-bottom:none;">
+          <div style="color:var(--lime);font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:1rem">tips_and_updates</span> System Update</div>
+          <div style="color:var(--white-70)">New feature: Students can now cancel meals up to 2 hours before service. Let them know!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS SECTION -->
+    <div id="section-settings" class="app-section">
+      <div class="page-header glass-panel">
+        <h1>Mess Settings</h1>
+        <p>Configure meal timings and cutoff rules.</p>
+      </div>
+      <div class="table-card">
+        <h3 style="margin-bottom:10px;">Meal Timings</h3>
+        <p style="color:var(--white-70);margin-bottom:20px;line-height:1.8;">
+          <strong>Breakfast:</strong> 7:30 AM - 9:30 AM <br/> 
+          <strong>Lunch:</strong> 12:30 PM - 2:30 PM <br/> 
+          <strong>Dinner:</strong> 7:30 PM - 9:30 PM
+        </p>
+        <button class="impact-btn"><span class="material-icons">edit</span>Edit Timings</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MOBILE TAB BAR -->
+<nav class="tab-bar">
+  <div class="tab-bar-inner">
+    <a href="index.html" class="tab-item"><span class="material-icons">home</span>Home</a>
+    <a href="dashboard-student.html" class="tab-item"><span class="material-icons">school</span>Students Dashboard</a>
+    <a href="#" onclick="switchSection('dashboard')" data-sec="dashboard" class="tab-item active"><span class="material-icons">analytics</span>Analytics</a>
+    <a href="#" onclick="switchSection('settings')" data-sec="settings" class="tab-item"><span class="material-icons">settings</span>Settings</a>
+  </div>
+</nav>
+
+<script>
+// Tab switching logic
+function switchSection(secId) {
+  // Update nav UI
+  document.querySelectorAll('.sb-item, .tab-item').forEach(el => {
+    if (el.dataset.sec) {
+      el.classList.remove('active');
+    }
+  });
+  document.querySelectorAll(`.sb-item[data-sec="${secId}"], .tab-item[data-sec="${secId}"]`).forEach(el => {
+    el.classList.add('active');
+  });
+
+  // Update sections
+  document.querySelectorAll('.app-section').forEach(el => {
+    el.classList.remove('active');
+  });
+  const target = document.getElementById('section-' + secId);
+  if (target) {
+    target.classList.add('active');
+  }
+}
+
+// Count up helper
+function countUp(el, target, suffix='', dur=1400) {
+  let s=0; const step=target/(dur/16);
+  const t=setInterval(()=>{
+    s+=step; if(s>=target){s=target;clearInterval(t);}
+    el.textContent=Math.round(s)+suffix;
+  },16);
+}
+
+// Sample data — these are just demo values, not claimed as real stats
+const total=200;
+const bVal=142, lVal=178, dVal=156;
+const impactVal=312; // "meals optimised" — not kg
+
+setTimeout(()=>{
+  countUp(document.getElementById('bNum'), bVal);
+  countUp(document.getElementById('lNum'), lVal);
+  countUp(document.getElementById('dNum'), dVal);
+  countUp(document.getElementById('impactNum'), impactVal, ' meals');
+  setTimeout(()=>{
+    const bp=Math.round(bVal/total*100);
+    const lp=Math.round(lVal/total*100);
+    const dp=Math.round(dVal/total*100);
+    document.getElementById('bFill').style.width=bp+'%';
+    document.getElementById('lFill').style.width=lp+'%';
+    document.getElementById('dFill').style.width=dp+'%';
+    document.getElementById('bLbl').textContent=bp+'% of hostel registered';
+    document.getElementById('lLbl').textContent=lp+'% of hostel registered';
+    document.getElementById('dLbl').textContent=dp+'% of hostel registered';
+  },200);
+},300);
+
+// Bar chart
+const wkData=[
+  {d:'Mon',b:58,l:76},{d:'Tue',b:62,l:82},{d:'Wed',b:71,l:88},
+  {d:'Thu',b:69,l:85},{d:'Fri',b:55,l:79},{d:'Sat',b:40,l:55},{d:'Sun',b:35,l:48},
+];
+const ca=document.getElementById('chartArea');
+wkData.forEach(day=>{
+  const col=document.createElement('div');
+  col.className='chart-col';
+  col.innerHTML=`<div class="bar-grp"><div class="bar bk" style="height:0%" data-h="${day.b}"></div><div class="bar ln" style="height:0%" data-h="${day.l}"></div></div><div class="bar-day-lbl">${day.d}</div>`;
+  ca.appendChild(col);
+});
+setTimeout(()=>{ document.querySelectorAll('.bar').forEach(b=>{ b.style.height=b.dataset.h+'%'; }); },350);
+
+// Live feed
+const sampleFeed=[
+  {i:'JS',n:'James Smith',sub:'Student · ID #8821',m:'LUNCH'},
+  {i:'AL',n:'Anya Lopez',sub:'Student · ID #4492',m:'LUNCH'},
+  {i:'RT',n:'Ryan T.',sub:'Student · ID #1029',m:'LUNCH'},
+  {i:'MK',n:'Maya Kaur',sub:'Student · ID #9931',m:'LUNCH'},
+  {i:'BC',n:'Ben Carter',sub:'Student · ID #0023',m:'LUNCH'},
+];
+const fl=document.getElementById('feedList');
+sampleFeed.forEach(s=>{
+  const el=document.createElement('div');
+  el.className='feed-item';
+  el.innerHTML=`<div class="f-avatar">${s.i}</div><div class="f-info"><div class="f-name">${s.n}</div><div class="f-sub">${s.sub}</div></div><div class="f-meal">${s.m}</div>`;
+  fl.appendChild(el);
+});
+const liveNames=[['PR','Priya Rao'],['AM','Arjun M.'],['SB','Sneha B.'],['RK','Rahul K.']];
+let li=0;
+setInterval(()=>{
+  const [i,n]=liveNames[li%liveNames.length];
+  const el=document.createElement('div');
+  el.className='feed-item';
+  el.innerHTML=`<div class="f-avatar">${i}</div><div class="f-info"><div class="f-name">${n}</div><div class="f-sub">just now</div></div><div class="f-meal">DINNER</div>`;
+  fl.prepend(el);
+  if(fl.children.length>7) fl.lastChild.remove();
+  li++;
+},4500);
+
+// Table
+const rows=[
+  {n:'Zoe Hernandez',s:'present',t:'12:14 PM',m:'LUNCH'},
+  {n:"Liam O'Conner",s:'present',t:'12:12 PM',m:'LUNCH'},
+  {n:'Sarah Wang',s:'expected',t:'--:--',m:'LUNCH'},
+  {n:'David Miller',s:'present',t:'12:05 PM',m:'LUNCH'},
+  {n:'Priya Sharma',s:'present',t:'7:42 AM',m:'BREAKFAST'},
+  {n:'Arjun Mehta',s:'expected',t:'--:--',m:'DINNER'},
+];
+const tb=document.getElementById('tBody');
+rows.forEach(r=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${r.n}</td><td><span class="badge badge-${r.s}">${r.s==='present'?'✓ Present':'⏳ Expected'}</span></td><td>${r.t}</td><td><span class="meal-lbl">${r.m}</span></td><td><button class="more-btn"><span class="material-icons" style="font-size:1.1rem">more_horiz</span></button></td>`;
+  tb.appendChild(tr);
+});
+</script>
+</body>
+</html>

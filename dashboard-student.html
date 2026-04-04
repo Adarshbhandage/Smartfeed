@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartFeed | Student Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<style>
+/* ── TOKENS (Glassmorphism Deep Theme - Enhanced) ── */
+:root {
+  --bg-primary:    #022c22;
+  --bg-secondary:  rgba(6, 78, 59, 0.4);
+  --bg-card:       rgba(255, 255, 255, 0.08);
+  --bg-card-alt:   rgba(255, 255, 255, 0.04);
+  --surface:       rgba(255, 255, 255, 0.1);
+  --lime:          #4ade80;
+  --lime-hover:    #86efac;
+  --lime-muted:    rgba(74, 222, 128, 0.2);
+  --lime-border:   rgba(74, 222, 128, 0.4);
+  --white:         #ffffff;
+  --white-70:      rgba(255, 255, 255, 0.85);
+  --white-40:      rgba(255, 255, 255, 0.60);
+  --white-20:      rgba(255, 255, 255, 0.25);
+  --green-accent:  #22c55e;
+  --red:           #ff5252;
+  --red-muted:     rgba(255,82,82,0.12);
+  --radius-sm:     10px;
+  --radius-md:     18px;
+  --radius-lg:     24px;
+  --radius-xl:     32px;
+  --r-sm: var(--radius-sm); --r-md: var(--radius-md); --r-lg: var(--radius-lg); --r-xl: var(--radius-xl);
+  --glass-blur:    blur(24px);
+  --glass-border:  1px solid rgba(255, 255, 255, 0.15);
+  --glass-border-t: 1px solid rgba(255, 255, 255, 0.35);
+  --glass-shadow:  inset 0 1px 1px rgba(255,255,255,0.2), 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --font-display:  'Google Sans Display', 'Roboto', sans-serif;
+  --font-body:     'Google Sans', 'Roboto', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+@keyframes gradientMovement {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(5, 150, 105, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(13, 148, 136, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(132, 204, 22, 0.2) 0%, transparent 60%);
+  background-size: 150% 150%;
+  animation: gradientMovement 20s ease infinite;
+  color: var(--white);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(2, 44, 34, 0.6);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0 24px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.1rem;
+  color: var(--white); text-decoration: none;
+}
+.nav-logo .material-icons { color: var(--lime); }
+.nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+.nav-links a {
+  color: var(--white-70); text-decoration: none; font-size: 0.9rem; font-weight: 500;
+  padding: 8px 12px; border-radius: var(--r-sm); transition: background 0.2s, color 0.2s;
+}
+.nav-links a:hover, .nav-links a.active { background: var(--white-20); color: var(--white); }
+.nav-links a.active { color: var(--lime); }
+.nav-cta {
+  background: var(--lime); color: #0d1f12;
+  padding: 8px 18px; border-radius: var(--r-xl);
+  font-weight: 700; font-size: 0.85rem; text-decoration: none;
+  transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--lime-hover); }
+
+/* MAIN */
+.main {
+  max-width: 900px; margin: 0 auto;
+  padding: 36px 24px 120px;
+}
+
+/* DATE / GREETING */
+.date-tag {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--lime); margin-bottom: 10px;
+}
+.greeting {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 700; margin-bottom: 28px; line-height: 1.2;
+}
+
+/* WEEK STRIP */
+.week-strip {
+  display: flex; gap: 8px; margin-bottom: 36px;
+  overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.week-strip::-webkit-scrollbar { display: none; }
+.week-day {
+  min-width: 52px; height: 74px;
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-top: var(--glass-border-t);
+  border-radius: var(--r-md);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  cursor: pointer; flex-shrink: 0; transition: border-color 0.2s, background 0.2s;
+}
+.week-day:hover { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
+.week-day.today {
+  background: var(--lime-muted); border-color: var(--lime);
+}
+.week-day .wd-name { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white-70); }
+.week-day .wd-num { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--white); }
+.week-day .wd-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--lime); opacity: 0.4; }
+.week-day.today .wd-name { color: var(--lime); }
+.week-day.today .wd-num { color: var(--lime); }
+.week-day.today .wd-dot { background: var(--lime); opacity: 1; box-shadow: 0 0 10px var(--lime); }
+
+/* MEALS */
+.meals-heading {
+  font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
+  margin-bottom: 16px;
+}
+.meals-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-bottom: 28px;
+}
+
+/* MEAL CARD */
+.meal-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--r-lg);
+  padding: 20px; display: flex; flex-direction: column;
+  transition: border-color 0.25s, transform 0.2s;
+  min-height: 280px;
+}
+.meal-card:hover { border-color: var(--lime-border); }
+.meal-emoji { font-size: 1.8rem; margin-bottom: 10px; }
+.meal-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+.meal-time { font-size: 0.78rem; color: var(--white-70); margin-bottom: 12px; line-height: 1.4; }
+.meal-menu { font-size: 0; /* hidden on this view */ }
+.meal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+.mbtn {
+  width: 100%; padding: 10px 14px; border-radius: var(--r-md);
+  font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all 0.2s; font-family: var(--font-body);
+}
+.mbtn-yes {
+  background: var(--lime-muted); border: 1px solid var(--lime-border);
+  color: var(--lime);
+}
+.mbtn-yes:hover, .mbtn-yes.chosen {
+  background: var(--lime); color: #0d1f12;
+}
+.mbtn-yes .material-icons { font-size: 0.9rem; }
+.mbtn-no {
+  background: transparent; border: 1px solid var(--white-20); color: var(--white-70);
+}
+.mbtn-no:hover { border-color: rgba(255,82,82,0.4); color: var(--red); }
+.mbtn-no.chosen { background: var(--red-muted); border-color: rgba(255,82,82,0.4); color: var(--red); }
+.cutoff-tag {
+  font-size: 0.68rem; color: var(--white-40); margin-top: 10px;
+  display: flex; align-items: center; gap: 4px;
+}
+.cutoff-tag .material-icons { font-size: 0.75rem; }
+
+/* BOTTOM ROW */
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.b-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-top: var(--glass-border-t);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--r-lg); padding: 24px;
+}
+.b-card-title {
+  font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+}
+.b-card-title .material-icons { color: var(--lime); font-size: 1.1rem; }
+
+/* streak */
+.streak-num { font-family: var(--font-display); font-size: 3rem; font-weight: 700; color: var(--lime); line-height: 1; }
+.streak-days { font-size: 0.85rem; color: var(--white-70); margin-top: 2px; margin-bottom: 16px; }
+.prog-track { height: 5px; background: var(--white-20); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.prog-fill { height: 100%; background: var(--lime); border-radius: 3px; width: 0%; transition: width 1.4s ease; }
+.prog-hint { font-size: 0.72rem; color: var(--white-40); }
+.impact-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--lime-muted); border: 1px solid var(--lime-border);
+  border-radius: var(--r-md); padding: 12px 14px;
+  font-size: 0.82rem; color: var(--lime); margin-top: 16px;
+}
+.impact-pill .material-icons { font-size: 1rem; }
+
+/* chef */
+.chef-photo {
+  width: 100%; height: 120px; object-fit: cover; object-position: center;
+  border-radius: var(--r-md); margin-bottom: 14px;
+  filter: brightness(0.75) saturate(1.1);
+}
+.chef-tag-label {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--lime); margin-bottom: 8px;
+}
+.chef-quote {
+  font-size: 0.88rem; color: var(--white-70); line-height: 1.6; font-style: italic;
+}
+
+/* MOBILE TAB BAR */
+.tab-bar {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(8, 15, 30, 0.7); backdrop-filter: var(--glass-blur);
+  border-top: var(--glass-border);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 500;
+}
+.tab-bar-inner { display: flex; justify-content: space-around; }
+.tab-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: var(--white-40); text-decoration: none;
+  font-size: 0.62rem; font-weight: 500; padding: 4px 14px; transition: color 0.2s;
+}
+.tab-item.active, .tab-item:hover { color: var(--lime); }
+.tab-item .material-icons { font-size: 1.25rem; }
+
+@media (max-width: 700px) {
+  .nav-links, .nav-cta { display: none; }
+  .tab-bar { display: block; }
+  body { padding-bottom: 68px; }
+  .main { padding: 24px 16px 100px; }
+  .meals-grid { grid-template-columns: 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .meal-card { min-height: auto; }
+}
+@media (min-width: 701px) and (max-width: 900px) {
+  .meals-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="material-icons">eco</span>SmartFeed
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="dashboard-student.html" class="active">Dashboard</a></li>
+    <li><a href="dashboard-owner.html">Analytics</a></li>
+    <li><a href="#">Profile</a></li>
+  </ul>
+  <a href="dashboard-student.html" class="nav-cta">Get Started</a>
+</header>
+
+<div class="main">
+  <div class="glass-panel">
+    <div class="date-tag" id="dateTag"></div>
+    <div class="greeting">Good morning, Adarsh 👋 — What's your plan for today?</div>
+
+    <!-- WEEK STRIP -->
+    <div class="week-strip" id="weekStrip" style="margin-bottom: 0;"></div>
+  </div>
+
+  <!-- MEALS -->
+  <div class="meals-heading">Today's Meals</div>
+  <div class="meals-grid">
+
+    <div class="meal-card" id="card-b">
+      <div class="meal-emoji">🍳</div>
+      <div class="meal-name">Breakfast</div>
+      <div class="meal-time">7:30 AM — Scrambled Eggs &amp; Toast</div>
+      <div class="meal-btns">
+        <button class="mbtn mbtn-yes" onclick="pick('b','yes')">
+          <span class="material-icons">check_circle</span> I'll be there
+        </button>
+        <button class="mbtn mbtn-no" onclick="pick('b','no')">Skipping this one</button>
+      </div>
+      <div class="cutoff-tag"><span class="material-icons">schedule</span>Mark by 9:00 PM tonight · Finalizing soon</div>
+    </div>
+
+    <div class="meal-card" id="card-l">
+      <div class="meal-emoji">🍲</div>
+      <div class="meal-name">Lunch</div>
+      <div class="meal-time">1:00 PM — Vegetable Biryani</div>
+      <div class="meal-btns">
+        <button class="mbtn mbtn-yes" onclick="pick('l','yes')">
+          <span class="material-icons">check_circle</span> I'll be there
+        </button>
+        <button class="mbtn mbtn-no" onclick="pick('l','no')">Skipping this one</button>
+      </div>
+      <div class="cutoff-tag"><span class="material-icons">schedule</span>Mark by 9:00 PM tonight · Finalizing soon</div>
+    </div>
+
+    <div class="meal-card" id="card-d">
+      <div class="meal-emoji">🥗</div>
+      <div class="meal-name">Dinner</div>
+      <div class="meal-time">8:00 PM — Grilled Chicken &amp; Salad</div>
+      <div class="meal-btns">
+        <button class="mbtn mbtn-yes" onclick="pick('d','yes')">
+          <span class="material-icons">check_circle</span> I'll be there
+        </button>
+        <button class="mbtn mbtn-no" onclick="pick('d','no')">Skipping this one</button>
+      </div>
+      <div class="cutoff-tag"><span class="material-icons">schedule</span>Mark by 9:00 PM tonight · Finalizing soon</div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM CARDS -->
+  <div class="bottom-grid">
+    <div class="b-card">
+      <div class="b-card-title"><span class="material-icons">local_fire_department</span> My Streak</div>
+      <div class="streak-num">12</div>
+      <div class="streak-days">Days</div>
+      <div class="impact-pill"><span class="material-icons">eco</span> Your meal data is helping reduce waste on campus.</div>
+      <div style="margin-top:16px">
+        <div class="prog-track"><div class="prog-fill" id="sfBar"></div></div>
+        <div class="prog-hint">3 more days to reach Platinum level</div>
+      </div>
+    </div>
+
+    <div class="b-card">
+      <div class="b-card-title"><span class="material-icons">restaurant</span> Chef's Update</div>
+      <img class="chef-photo"
+        src="chef_3d_icon.png" style="filter:none; object-fit:contain; object-position:bottom;"
+        alt="Animated Chef Mascot" onerror="this.style.display='none'"/>
+      <div class="chef-tag-label">Chef's Update</div>
+      <div class="chef-quote">"Thanks for the head's up, Adarsh! Knowing who's skipping helps us prep the right amount. Every mark makes a difference."</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<nav class="tab-bar">
+  <div class="tab-bar-inner">
+    <a href="index.html" class="tab-item"><span class="material-icons">home</span>Home</a>
+    <a href="dashboard-student.html" class="tab-item active"><span class="material-icons">dashboard</span>Dashboard</a>
+    <a href="dashboard-owner.html" class="tab-item"><span class="material-icons">analytics</span>Analytics</a>
+    <a href="#" class="tab-item"><span class="material-icons">person</span>Profile</a>
+  </div>
+</nav>
+
+<script>
+// Date
+const now = new Date();
+document.getElementById('dateTag').textContent = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+
+// Week strip
+const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const strip=document.getElementById('weekStrip');
+for(let i=-3;i<=3;i++){
+  const d=new Date(now); d.setDate(d.getDate()+i);
+  const el=document.createElement('div');
+  el.className='week-day'+(i===0?' today':'');
+  el.innerHTML=`<span class="wd-name">${days[d.getDay()]}</span><span class="wd-num">${d.getDate()}</span><div class="wd-dot"></div>`;
+  strip.appendChild(el);
+}
+
+// Meal toggle
+const state={b:null,l:null,d:null};
+function pick(id,choice){
+  state[id]=choice;
+  const card=document.getElementById('card-'+id);
+  const yes=card.querySelectorAll('.mbtn')[0];
+  const no=card.querySelectorAll('.mbtn')[1];
+  yes.classList.toggle('chosen',choice==='yes');
+  no.classList.toggle('chosen',choice==='no');
+  if(choice==='yes'){no.textContent='Skipping this one'; no.classList.remove('chosen');}
+  if(choice==='no'){yes.innerHTML='<span class="material-icons">check_circle</span> I\'ll be there'; yes.classList.remove('chosen');}
+}
+
+// Streak bar
+setTimeout(()=>{ document.getElementById('sfBar').style.width='80%'; }, 400);
+</script>
+</body>
+</html>
