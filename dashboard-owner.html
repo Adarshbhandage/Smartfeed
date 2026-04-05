@@ -572,27 +572,246 @@ tr:hover td{background:rgba(241,248,238,0.02);}
   </div>
 </nav>
 
-<script>
+<!-- ADD STUDENT MODAL -->
+<div id="addStudentModal" style="
+  display:none;position:fixed;inset:0;
+  background:rgba(2,20,14,0.85);backdrop-filter:blur(16px);
+  z-index:3000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(28px);
+    border:1px solid rgba(255,255,255,0.18);border-top:1px solid rgba(255,255,255,0.35);
+    box-shadow:0 24px 80px rgba(0,0,0,0.6);border-radius:28px;padding:36px 32px;
+    width:100%;max-width:420px;position:relative;">
+    <button onclick="closeAddModal()" style="position:absolute;top:14px;right:18px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.5rem;cursor:pointer;">&times;</button>
+    <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:6px;">Add New Student</div>
+    <p style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:24px;">Student will receive a login email with their credentials.</p>
+    <div style="margin-bottom:12px;"><label style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.6);display:block;margin-bottom:5px;">Full Name</label>
+      <input id="s-name" type="text" placeholder="e.g. Adarsh Kumar" style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:11px;color:#fff;font-family:var(--font-body);font-size:0.9rem;outline:none;"/></div>
+    <div style="margin-bottom:12px;"><label style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.6);display:block;margin-bottom:5px;">USN / Roll Number</label>
+      <input id="s-usn" type="text" placeholder="e.g. 1RV21CS043" style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:11px;color:#fff;font-family:var(--font-body);font-size:0.9rem;outline:none;"/></div>
+    <div style="margin-bottom:20px;"><label style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.6);display:block;margin-bottom:5px;">Gmail (for login &amp; daily reminders)</label>
+      <input id="s-email" type="email" placeholder="student@gmail.com" style="width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:11px;color:#fff;font-family:var(--font-body);font-size:0.9rem;outline:none;"/></div>
+    <button id="addStudentBtn" onclick="doAddStudent()" style="width:100%;padding:13px;background:#4ade80;color:#0d1f12;border:none;border-radius:13px;font-family:var(--font-display);font-size:0.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span>Add Student &amp; Send Welcome Email</span>
+    </button>
+    <div id="addStudentErr" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(255,82,82,0.12);border:1px solid rgba(255,82,82,0.3);border-radius:10px;color:#ff8080;font-size:0.83rem;"></div>
+    <div id="addStudentOk" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);border-radius:10px;color:#4ade80;font-size:0.83rem;"></div>
+  </div>
+</div>
+
+<script type="application/ignored">
+// ── Config ─────────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:5000/api';
+const token    = localStorage.getItem('sf_token');
+const user     = (() => { try { return JSON.parse(localStorage.getItem('sf_user')); } catch { return null; } })();
+
+// Auth guard — redirect to landing if not logged in as mess owner
+if (!token || !user) { window.location.href = 'index.html'; }
+if (user && user.role === 'student') { window.location.href = 'dashboard-student.html'; }
+
+// Set owner name in sidebar
+if (user) {
+  const el = document.querySelector('.sb-owner-name');
+  if (el) el.textContent = user.name || user.email;
+}
+
+// ── API helper ─────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json();
+  if (res.status === 401 || res.status === 403) {
+    localStorage.clear(); window.location.href = 'index.html'; return;
+  }
+  return data;
+}
+
+// ── Load real stats from backend ────────────────────────────────────
+async function loadStats() {
+  try {
+    const data = await api('GET', '/admin/stats');
+    if (!data.success) return;
+    const stats = data.data;
+    const total = stats.totalStudents || 1;
+
+    document.getElementById('bNum').textContent = stats.totalBreakfast || 0;
+    document.getElementById('lNum').textContent = stats.totalLunch || 0;
+    document.getElementById('dNum').textContent = stats.totalDinner || 0;
+
+    const bp = Math.round((stats.totalBreakfast||0)/total*100);
+    const lp = Math.round((stats.totalLunch||0)/total*100);
+    const dp = Math.round((stats.totalDinner||0)/total*100);
+
+    setTimeout(() => {
+      document.getElementById('bFill').style.width = bp + '%';
+      document.getElementById('lFill').style.width = lp + '%';
+      document.getElementById('dFill').style.width = dp + '%';
+      document.getElementById('bLbl').textContent = bp + '% of students confirmed';
+      document.getElementById('lLbl').textContent = lp + '% of students confirmed';
+      document.getElementById('dLbl').textContent = dp + '% of students confirmed';
+    }, 300);
+
+    document.getElementById('impactNum').textContent = ((stats.totalBreakfast||0) + (stats.totalLunch||0) + (stats.totalDinner||0)) + ' meals';
+  } catch(e) {
+    // Fallback: keep demo data visible
+  }
+}
+
+// ── Load students table ────────────────────────────────────────────
+async function loadStudents() {
+  try {
+    const data = await api('GET', '/students');
+    if (!data.success) return;
+
+    const students = data.data || [];
+    const tb = document.getElementById('tBody');
+    tb.innerHTML = '';
+
+    if (students.length === 0) {
+      tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,0.4);padding:32px;">No students yet. Click "Add Student" to get started.</td></tr>`;
+      return;
+    }
+
+    students.forEach(s => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${s.name}</td>
+        <td><span class="badge badge-present">✓ Active</span></td>
+        <td>${s.usn || '—'}</td>
+        <td>${s.email}</td>
+        <td><button class="more-btn" onclick="deleteStudent('${s.id}','${s.name}')">
+          <span class="material-icons" style="font-size:1.1rem;color:rgba(255,82,82,0.7)">person_remove</span>
+        </button></td>`;
+      tb.appendChild(tr);
+    });
+  } catch(e) {}
+}
+
+// ── Add Student Modal ──────────────────────────────────────────────
+function openAddModal() {
+  const m = document.getElementById('addStudentModal');
+  m.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeAddModal() {
+  document.getElementById('addStudentModal').style.display = 'none';
+  document.body.style.overflow = '';
+  document.getElementById('addStudentErr').style.display = 'none';
+  document.getElementById('addStudentOk').style.display = 'none';
+}
+
+async function doAddStudent() {
+  const name  = document.getElementById('s-name').value.trim();
+  const usn   = document.getElementById('s-usn').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const errEl = document.getElementById('addStudentErr');
+  const okEl  = document.getElementById('addStudentOk');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!name || !email) { errEl.textContent = '⚠️ Name and email are required.'; errEl.style.display='block'; return; }
+  if (!usn)  { errEl.textContent = '⚠️ USN/Roll number is required.'; errEl.style.display='block'; return; }
+
+  const btn = document.getElementById('addStudentBtn');
+  btn.disabled = true;
+  btn.querySelector('span').textContent = 'Adding...';
+
+  try {
+    const data = await api('POST', '/students', { name, usn, email });
+    btn.disabled = false;
+    btn.querySelector('span').textContent = 'Add Student & Send Welcome Email';
+
+    if (!data.success) throw new Error(data.message || 'Failed to add student.');
+
+    okEl.textContent = '✅ Student added! Welcome email sent to ' + email;
+    okEl.style.display = 'block';
+    document.getElementById('s-name').value = '';
+    document.getElementById('s-usn').value  = '';
+    document.getElementById('s-email').value = '';
+    loadStudents(); // Refresh table
+  } catch(e) {
+    btn.disabled = false;
+    btn.querySelector('span').textContent = 'Add Student & Send Welcome Email';
+    errEl.textContent = '⚠️ ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+async function deleteStudent(id, name) {
+  if (!confirm(`Remove ${name} from your mess? They will no longer receive reminders.`)) return;
+  try {
+    await api('DELETE', `/students/${id}`);
+    loadStudents();
+  } catch(e) { alert('Failed to remove student: ' + e.message); }
+}
+
+// ── Add "Add Student" button to the students section ──────────────
+function patchStudentsSection() {
+  const hdr = document.querySelector('#section-students .page-header.glass-panel');
+  if (hdr) {
+    const btn = document.createElement('button');
+    btn.onclick = openAddModal;
+    btn.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:#4ade80;color:#0d1f12;border:none;padding:10px 20px;border-radius:40px;font-weight:700;font-size:0.88rem;cursor:pointer;margin-top:12px;';
+    btn.innerHTML = '<span class="material-icons" style="font-size:1rem;">person_add</span> Add Student';
+    hdr.appendChild(btn);
+  }
+
+  // Also patch student table headers to match real data
+  const thead = document.querySelector('#section-students table thead tr');
+  if (thead) {
+    thead.innerHTML = '<th>Name</th><th>Status</th><th>USN</th><th>Email</th><th></th>';
+  }
+}
+
+// ── Patch "Daily Log" table headers ───────────────────────────────
+function patchDailyLog() {
+  const thead = document.querySelector('#section-dashboard .table-card table thead tr');
+  if (thead) {
+    thead.innerHTML = '<th>Student Name</th><th>Status</th><th>USN</th><th>Meal Marked</th><th></th>';
+  }
+}
+
+// ── Log Out ────────────────────────────────────────────────────────
+function doLogout() {
+  localStorage.removeItem('sf_token');
+  localStorage.removeItem('sf_user');
+  window.location.href = 'index.html';
+}
+
+// Add logout link to sidebar footer
+document.addEventListener('DOMContentLoaded', () => {
+  patchStudentsSection();
+  patchDailyLog();
+  const sbFooter = document.querySelector('.sb-footer');
+  if (sbFooter) {
+    const logoutLink = document.createElement('a');
+    logoutLink.href = '#';
+    logoutLink.onclick = doLogout;
+    logoutLink.className = 'sb-item';
+    logoutLink.innerHTML = '<span class="material-icons">logout</span>Log Out';
+    logoutLink.style.marginTop = '8px';
+    document.querySelector('.sb-nav').appendChild(logoutLink);
+  }
+  loadStats();
+  loadStudents();
+});
+
 // Tab switching logic
 function switchSection(secId) {
-  // Update nav UI
   document.querySelectorAll('.sb-item, .tab-item').forEach(el => {
-    if (el.dataset.sec) {
-      el.classList.remove('active');
-    }
+    if (el.dataset.sec) el.classList.remove('active');
   });
   document.querySelectorAll(`.sb-item[data-sec="${secId}"], .tab-item[data-sec="${secId}"]`).forEach(el => {
     el.classList.add('active');
   });
-
-  // Update sections
-  document.querySelectorAll('.app-section').forEach(el => {
-    el.classList.remove('active');
-  });
+  document.querySelectorAll('.app-section').forEach(el => el.classList.remove('active'));
   const target = document.getElementById('section-' + secId);
-  if (target) {
-    target.classList.add('active');
-  }
+  if (target) target.classList.add('active');
+
+  // Load fresh data when switching to students tab
+  if (secId === 'students') loadStudents();
 }
 
 // Count up helper
@@ -604,30 +823,7 @@ function countUp(el, target, suffix='', dur=1400) {
   },16);
 }
 
-// Sample data — these are just demo values, not claimed as real stats
-const total=200;
-const bVal=142, lVal=178, dVal=156;
-const impactVal=312; // "meals optimised" — not kg
-
-setTimeout(()=>{
-  countUp(document.getElementById('bNum'), bVal);
-  countUp(document.getElementById('lNum'), lVal);
-  countUp(document.getElementById('dNum'), dVal);
-  countUp(document.getElementById('impactNum'), impactVal, ' meals');
-  setTimeout(()=>{
-    const bp=Math.round(bVal/total*100);
-    const lp=Math.round(lVal/total*100);
-    const dp=Math.round(dVal/total*100);
-    document.getElementById('bFill').style.width=bp+'%';
-    document.getElementById('lFill').style.width=lp+'%';
-    document.getElementById('dFill').style.width=dp+'%';
-    document.getElementById('bLbl').textContent=bp+'% of hostel registered';
-    document.getElementById('lLbl').textContent=lp+'% of hostel registered';
-    document.getElementById('dLbl').textContent=dp+'% of hostel registered';
-  },200);
-},300);
-
-// Bar chart
+// Bar chart (week trend — kept as illustration)
 const wkData=[
   {d:'Mon',b:58,l:76},{d:'Tue',b:62,l:82},{d:'Wed',b:71,l:88},
   {d:'Thu',b:69,l:85},{d:'Fri',b:55,l:79},{d:'Sat',b:40,l:55},{d:'Sun',b:35,l:48},
@@ -641,48 +837,22 @@ wkData.forEach(day=>{
 });
 setTimeout(()=>{ document.querySelectorAll('.bar').forEach(b=>{ b.style.height=b.dataset.h+'%'; }); },350);
 
-// Live feed
-const sampleFeed=[
-  {i:'JS',n:'James Smith',sub:'Student · ID #8821',m:'LUNCH'},
-  {i:'AL',n:'Anya Lopez',sub:'Student · ID #4492',m:'LUNCH'},
-  {i:'RT',n:'Ryan T.',sub:'Student · ID #1029',m:'LUNCH'},
-  {i:'MK',n:'Maya Kaur',sub:'Student · ID #9931',m:'LUNCH'},
-  {i:'BC',n:'Ben Carter',sub:'Student · ID #0023',m:'LUNCH'},
-];
+// Live feed (kept as illustration while real data loads)
 const fl=document.getElementById('feedList');
-sampleFeed.forEach(s=>{
-  const el=document.createElement('div');
-  el.className='feed-item';
-  el.innerHTML=`<div class="f-avatar">${s.i}</div><div class="f-info"><div class="f-name">${s.n}</div><div class="f-sub">${s.sub}</div></div><div class="f-meal">${s.m}</div>`;
-  fl.appendChild(el);
-});
 const liveNames=[['PR','Priya Rao'],['AM','Arjun M.'],['SB','Sneha B.'],['RK','Rahul K.']];
 let li=0;
 setInterval(()=>{
   const [i,n]=liveNames[li%liveNames.length];
   const el=document.createElement('div');
   el.className='feed-item';
-  el.innerHTML=`<div class="f-avatar">${i}</div><div class="f-info"><div class="f-name">${n}</div><div class="f-sub">just now</div></div><div class="f-meal">DINNER</div>`;
+  el.innerHTML=`<div class="f-avatar">${i}</div><div class="f-info"><div class="f-name">${n}</div><div class="f-sub">just now</div></div><div class="f-meal">MEAL</div>`;
   fl.prepend(el);
   if(fl.children.length>7) fl.lastChild.remove();
   li++;
-},4500);
-
-// Table
-const rows=[
-  {n:'Zoe Hernandez',s:'present',t:'12:14 PM',m:'LUNCH'},
-  {n:"Liam O'Conner",s:'present',t:'12:12 PM',m:'LUNCH'},
-  {n:'Sarah Wang',s:'expected',t:'--:--',m:'LUNCH'},
-  {n:'David Miller',s:'present',t:'12:05 PM',m:'LUNCH'},
-  {n:'Priya Sharma',s:'present',t:'7:42 AM',m:'BREAKFAST'},
-  {n:'Arjun Mehta',s:'expected',t:'--:--',m:'DINNER'},
-];
-const tb=document.getElementById('tBody');
-rows.forEach(r=>{
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td>${r.n}</td><td><span class="badge badge-${r.s}">${r.s==='present'?'✓ Present':'⏳ Expected'}</span></td><td>${r.t}</td><td><span class="meal-lbl">${r.m}</span></td><td><button class="more-btn"><span class="material-icons" style="font-size:1.1rem">more_horiz</span></button></td>`;
-  tb.appendChild(tr);
-});
+},5000);
 </script>
+<script src="smartfeed-config.js"></script>
+<script src="smartfeed-api.js"></script>
+<script src="dashboard-owner-app.js"></script>
 </body>
 </html>

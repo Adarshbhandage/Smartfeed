@@ -378,12 +378,44 @@ body {
   </div>
 </nav>
 
-<script>
-// Date
-const now = new Date();
-document.getElementById('dateTag').textContent = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+<script type="application/ignored">
+// ── Config ─────────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:5000/api';
+const token    = localStorage.getItem('sf_token');
+const user     = (() => { try { return JSON.parse(localStorage.getItem('sf_user')); } catch { return null; } })();
 
-// Week strip
+// Auth guard — redirect if not logged in
+if (!token || !user) { window.location.href = 'index.html'; }
+
+// Set greeting with real name
+if (user) {
+  const greet = document.querySelector('.greeting');
+  if (greet) {
+    const hour = new Date().getHours();
+    const tod = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+    greet.textContent = `Good ${tod}, ${user.name || 'there'} 👋 — What's your plan for today?`;
+  }
+  // Add logout to nav
+  const navCta = document.querySelector('.nav-cta');
+  if (navCta) {
+    navCta.textContent = 'Log Out';
+    navCta.href = '#';
+    navCta.onclick = (e) => {
+      e.preventDefault();
+      localStorage.removeItem('sf_token');
+      localStorage.removeItem('sf_user');
+      window.location.href = 'index.html';
+    };
+  }
+}
+
+// ── Date tag ─────────────────────────────────────────────────────────
+const now = new Date();
+document.getElementById('dateTag').textContent = now.toLocaleDateString('en-IN',{
+  weekday:'long',day:'numeric',month:'long',year:'numeric'
+}).toUpperCase();
+
+// ── Week strip ────────────────────────────────────────────────────────
 const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const strip=document.getElementById('weekStrip');
 for(let i=-3;i<=3;i++){
@@ -394,21 +426,117 @@ for(let i=-3;i<=3;i++){
   strip.appendChild(el);
 }
 
-// Meal toggle
-const state={b:null,l:null,d:null};
-function pick(id,choice){
-  state[id]=choice;
-  const card=document.getElementById('card-'+id);
-  const yes=card.querySelectorAll('.mbtn')[0];
-  const no=card.querySelectorAll('.mbtn')[1];
-  yes.classList.toggle('chosen',choice==='yes');
-  no.classList.toggle('chosen',choice==='no');
-  if(choice==='yes'){no.textContent='Skipping this one'; no.classList.remove('chosen');}
-  if(choice==='no'){yes.innerHTML='<span class="material-icons">check_circle</span> I\'ll be there'; yes.classList.remove('chosen');}
+// ── Load today's menu from backend ───────────────────────────────────
+async function loadTodayMenu() {
+  try {
+    const res = await fetch(`${API_BASE}/menu/today`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!data.success || !data.data) return;
+
+    const menu = data.data;
+    const fmt = (items) => Array.isArray(items) && items.length ? items.join(', ') : null;
+
+    if (fmt(menu.breakfast)) {
+      document.querySelector('#card-b .meal-time').textContent = '7:30 AM — ' + fmt(menu.breakfast);
+    }
+    if (fmt(menu.lunch)) {
+      document.querySelector('#card-l .meal-time').textContent = '1:00 PM — ' + fmt(menu.lunch);
+    }
+    if (fmt(menu.dinner)) {
+      document.querySelector('#card-d .meal-time').textContent = '8:00 PM — ' + fmt(menu.dinner);
+    }
+  } catch(e) {
+    // Keep default placeholders if no menu set
+  }
+}
+loadTodayMenu();
+
+// ── Load my existing selection for today ────────────────────────────
+async function loadMyMeals() {
+  try {
+    const res = await fetch(`${API_BASE}/meals/my-meals`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!data.success || !data.data || !data.data.length) return;
+
+    // Find today's record
+    const today = now.toISOString().split('T')[0];
+    const todayMeal = data.data.find(m => m.date === today);
+    if (!todayMeal) return;
+
+    // Pre-fill selections
+    if (todayMeal.breakfast !== null && todayMeal.breakfast !== undefined) {
+      pick('b', todayMeal.breakfast ? 'yes' : 'no', false);
+    }
+    if (todayMeal.lunch !== null && todayMeal.lunch !== undefined) {
+      pick('l', todayMeal.lunch ? 'yes' : 'no', false);
+    }
+    if (todayMeal.dinner !== null && todayMeal.dinner !== undefined) {
+      pick('d', todayMeal.dinner ? 'yes' : 'no', false);
+    }
+  } catch(e) {}
+}
+loadMyMeals();
+
+// ── Meal selection state ───────────────────────────────────────────
+const mealState = { b: null, l: null, d: null };
+let saveTimeout = null;
+
+async function pick(id, choice, save=true) {
+  mealState[id] = choice;
+  const card = document.getElementById('card-' + id);
+  const yes  = card.querySelectorAll('.mbtn')[0];
+  const no   = card.querySelectorAll('.mbtn')[1];
+  yes.classList.toggle('chosen', choice === 'yes');
+  no.classList.toggle('chosen',  choice === 'no');
+  if (choice === 'yes') {
+    no.textContent = 'Skipping this one';
+    no.classList.remove('chosen');
+  }
+  if (choice === 'no') {
+    yes.innerHTML = '<span class="material-icons">check_circle</span> I\'ll be there';
+    yes.classList.remove('chosen');
+  }
+
+  if (save) {
+    // Debounce: save 1 second after the last change
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveMeals, 1000);
+  }
 }
 
-// Streak bar
-setTimeout(()=>{ document.getElementById('sfBar').style.width='80%'; }, 400);
+async function saveMeals() {
+  const payload = {
+    breakfast: mealState.b === 'yes' ? true : mealState.b === 'no' ? false : null,
+    lunch:     mealState.l === 'yes' ? true : mealState.l === 'no' ? false : null,
+    dinner:    mealState.d === 'yes' ? true : mealState.d === 'no' ? false : null,
+  };
+  // Only send if at least one choice is made
+  if (payload.breakfast === null && payload.lunch === null && payload.dinner === null) return;
+
+  try {
+    await fetch(`${API_BASE}/meals/select-meal`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+    // Silently saved — no alert needed
+  } catch(e) {
+    // Silent fail is okay for attendance
+  }
+}
+
+// ── Streak bar animation ────────────────────────────────────────────
+setTimeout(() => { document.getElementById('sfBar').style.width = '80%'; }, 400);
 </script>
+<script src="smartfeed-config.js"></script>
+<script src="smartfeed-api.js"></script>
+<script src="dashboard-student-app.js"></script>
 </body>
 </html>

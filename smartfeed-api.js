@@ -1,202 +1,460 @@
-/**
- * SmartFeed AI — Frontend API Integration Helper
- * 
- * Drop this file into your frontend project and use these functions
- * to connect all buttons and forms to the backend API.
- * 
- * Usage:
- *   <script src="smartfeed-api.js"></script>
- *   
- *   // Then call from your button handlers:
- *   SmartFeedAPI.payment.createOrder().then(...)
- *   SmartFeedAPI.auth.login(email, password).then(...)
- */
-
-const SmartFeedAPI = (() => {
-
-  // ────────────────────────────────────────────────────────────
-  // CONFIG — Change BASE_URL to your deployed backend URL
-  // ────────────────────────────────────────────────────────────
-  const BASE_URL = 'http://localhost:5000/api';
-
-  // ── Token helpers ────────────────────────────────────────────
-  const getToken = () => localStorage.getItem('sf_token');
-  const setToken = (t) => localStorage.setItem('sf_token', t);
-  const getUser  = () => JSON.parse(localStorage.getItem('sf_user') || 'null');
-  const setUser  = (u) => localStorage.setItem('sf_user', JSON.stringify(u));
-  const clearSession = () => {
-    localStorage.removeItem('sf_token');
-    localStorage.removeItem('sf_user');
+(function (global) {
+  const STORAGE_KEYS = {
+    token: 'sf_token',
+    user: 'sf_user',
+    apiBase: 'sf_api_base',
   };
 
-  // ── HTTP helper ──────────────────────────────────────────────
-  const request = async (method, path, body = null, auth = true) => {
-    const headers = { 'Content-Type': 'application/json' };
-    if (auth && getToken()) headers['Authorization'] = `Bearer ${getToken()}`;
-
-    const options = { method, headers };
-    if (body) options.body = JSON.stringify(body);
-
-    const res = await fetch(`${BASE_URL}${path}`, options);
-    const data = await res.json();
-
-    if (!data.success) {
-      throw new Error(data.message || 'Request failed');
+  const normalizeBaseUrl = (value) => {
+    if (!value || typeof value !== 'string') {
+      return 'http://localhost:5000/api';
     }
-    return data;
+
+    const trimmed = value.trim().replace(/\/+$/, '');
+    if (!trimmed || trimmed === '__SMARTFEED_BACKEND_URL__') {
+      return 'http://localhost:5000/api';
+    }
+
+    return /\/api$/i.test(trimmed) ? trimmed : `${trimmed}/api`;
   };
 
-  // ════════════════════════════════════════════════════════════
-  // 1. PAYMENT — Razorpay ₹1 Registration
-  // ════════════════════════════════════════════════════════════
+  const readStorage = (key) => {
+    try {
+      return global.localStorage.getItem(key);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const writeStorage = (key, value) => {
+    try {
+      global.localStorage.setItem(key, value);
+    } catch (error) {
+      return null;
+    }
+
+    return value;
+  };
+
+  const removeStorage = (key) => {
+    try {
+      global.localStorage.removeItem(key);
+    } catch (error) {
+      return null;
+    }
+
+    return null;
+  };
+
+  const resolveBaseUrl = () => {
+    if (global.SMARTFEED_API_BASE) {
+      return normalizeBaseUrl(global.SMARTFEED_API_BASE);
+    }
+
+    if (global.SMARTFEED_CONFIG && global.SMARTFEED_CONFIG.apiBase) {
+      return normalizeBaseUrl(global.SMARTFEED_CONFIG.apiBase);
+    }
+
+    const persisted = readStorage(STORAGE_KEYS.apiBase);
+    if (persisted) {
+      return normalizeBaseUrl(persisted);
+    }
+
+    if (
+      global.location &&
+      (global.location.protocol === 'http:' || global.location.protocol === 'https:')
+    ) {
+      return normalizeBaseUrl(global.location.origin + '/api');
+    }
+
+    return 'http://localhost:5000/api';
+  };
+
+  let baseUrl = resolveBaseUrl();
+
+  const getToken = () => readStorage(STORAGE_KEYS.token);
+
+  const setToken = (token) => writeStorage(STORAGE_KEYS.token, token);
+
+  const getUser = () => {
+    const raw = readStorage(STORAGE_KEYS.user);
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      removeStorage(STORAGE_KEYS.user);
+      return null;
+    }
+  };
+
+  const setUser = (user) => writeStorage(STORAGE_KEYS.user, JSON.stringify(user));
+
+  const clearSession = () => {
+    removeStorage(STORAGE_KEYS.token);
+    removeStorage(STORAGE_KEYS.user);
+  };
+
+  const setBaseUrl = (nextBaseUrl) => {
+    baseUrl = normalizeBaseUrl(nextBaseUrl);
+    writeStorage(STORAGE_KEYS.apiBase, baseUrl);
+    return baseUrl;
+  };
+
+  const getDashboardPath = (user) => {
+    const activeUser = user || getUser();
+    if (!activeUser) {
+      return 'index.html';
+    }
+
+    return activeUser.role === 'admin' || activeUser.role === 'mess_owner'
+      ? 'dashboard-owner.html'
+      : 'dashboard-student.html';
+  };
+
+  const parseResponse = async (response) => {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+
+    const text = await response.text();
+    return text ? { success: response.ok, message: text } : { success: response.ok };
+  };
+
+  const request = async (method, path, options) => {
+    const opts = options || {};
+    const headers = Object.assign({}, opts.headers || {});
+
+    if (opts.body !== undefined) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    if (opts.auth !== false) {
+      const token = getToken();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
+    let response;
+    try {
+      response = await fetch(`${baseUrl}${path}`, {
+        method,
+        headers,
+        body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+      });
+    } catch (error) {
+      const networkError = new Error(
+        'Unable to reach the SmartFeed backend. Check that the backend is running and smartfeed-config.js has the correct backend URL.'
+      );
+      networkError.cause = error;
+      throw networkError;
+    }
+
+    const payload = await parseResponse(response);
+
+    if (!response.ok || !payload.success) {
+      if (opts.auth !== false && (response.status === 401 || response.status === 403)) {
+        clearSession();
+      }
+
+      const error = new Error(payload.message || `Request failed with status ${response.status}.`);
+      error.status = response.status;
+      error.payload = payload;
+      throw error;
+    }
+
+    return payload;
+  };
+
+  const auth = {
+    async signup(payload) {
+      const response = await request('POST', '/auth/signup', {
+        auth: false,
+        body: payload,
+      });
+
+      return response.data;
+    },
+
+    async login(email, password) {
+      const response = await request('POST', '/auth/login', {
+        auth: false,
+        body: { email, password },
+      });
+
+      setToken(response.data.token);
+      setUser(response.data.user);
+      return response.data;
+    },
+
+    async getMe() {
+      return request('GET', '/auth/me');
+    },
+
+    logout(redirectPath) {
+      clearSession();
+      global.location.href = redirectPath || 'index.html';
+    },
+
+    isLoggedIn() {
+      return Boolean(getToken() && getUser());
+    },
+
+    requireSession(allowedRoles) {
+      const user = getUser();
+      const token = getToken();
+
+      if (!token || !user) {
+        clearSession();
+        global.location.href = 'index.html';
+        return null;
+      }
+
+      if (Array.isArray(allowedRoles) && allowedRoles.length && !allowedRoles.includes(user.role)) {
+        global.location.href = getDashboardPath(user);
+        return null;
+      }
+
+      return user;
+    },
+  };
+
   const payment = {
+    createOrder() {
+      return request('POST', '/payment/create-order', { auth: false });
+    },
 
-    /**
-     * Full Razorpay payment flow.
-     * Call this on "Create Account" button click.
-     * 
-     * @param {Object} userData - { name, email, phone? }
-     * @param {Function} onSuccess - called with { paymentId, status }
-     * @param {Function} onFailure - called with error message
-     */
-    initiatePayment: async ({ name, email, phone }, onSuccess, onFailure) => {
+    verify(data) {
+      return request('POST', '/payment/verify', { auth: false, body: data });
+    },
+
+    initiateOwnerRegistration(details, onSuccess, onFailure) {
+      this.createOrder()
+        .then((response) => {
+          const order = response.data;
+          const razorpay = new global.Razorpay({
+            key: order.key,
+            amount: order.amount,
+            currency: order.currency,
+            name: 'SmartFeed AI',
+            description: 'Mess Owner Registration - Rs 1',
+            order_id: order.orderId,
+            prefill: {
+              name: details.name,
+              email: details.email,
+              contact: details.phone || '',
+            },
+            theme: { color: '#4ade80' },
+            handler: async (result) => {
+              try {
+                const verification = await this.verify({
+                  razorpay_payment_id: result.razorpay_payment_id,
+                  razorpay_order_id: result.razorpay_order_id,
+                  razorpay_signature: result.razorpay_signature,
+                  userName: details.name,
+                  userEmail: details.email,
+                  userPhone: details.phone || '',
+                });
+
+                if (typeof onSuccess === 'function') {
+                  onSuccess(verification.data);
+                }
+              } catch (error) {
+                if (typeof onFailure === 'function') {
+                  onFailure(error);
+                }
+              }
+            },
+            modal: {
+              ondismiss() {
+                if (typeof onFailure === 'function') {
+                  onFailure(new Error('Payment was cancelled. Please try again.'));
+                }
+              },
+            },
+          });
+
+          razorpay.open();
+        })
+        .catch((error) => {
+          if (typeof onFailure === 'function') {
+            onFailure(error);
+          }
+        });
+    },
+  };
+
+  const meals = {
+    selectMeal(payload) {
+      return request('POST', '/meals/select-meal', { body: payload });
+    },
+
+    updateMeal(payload) {
+      return request('PUT', '/meals/update-meal', { body: payload });
+    },
+
+    getMyMeals() {
+      return request('GET', '/meals/my-meals');
+    },
+
+    async saveTodaySelection(payload) {
       try {
-        // Step 1: Create Razorpay order on backend
-        const { data: order } = await request('POST', '/payment/create-order', null, false);
+        return await this.selectMeal(payload);
+      } catch (error) {
+        if (error.status === 409) {
+          return this.updateMeal(payload);
+        }
 
-        // Step 2: Open Razorpay checkout
-        const options = {
-          key:         order.key,
-          amount:      order.amount,
-          currency:    order.currency,
-          name:        'SmartFeed AI',
-          description: 'Registration Fee – ₹1',
-          order_id:    order.orderId,
-          prefill: { name, email, contact: phone || '' },
-          theme: { color: '#4ade80' },
-
-          handler: async (response) => {
-            // Step 3: Verify & register interest
-            try {
-              const result = await request('POST', '/payment/verify', {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id:   response.razorpay_order_id,
-                razorpay_signature:  response.razorpay_signature,
-                userName:  name,
-                userEmail: email,
-                userPhone: phone || '',
-              }, false);
-              onSuccess && onSuccess(result.data);
-            } catch (err) {
-              onFailure && onFailure(err.message);
-            }
-          },
-
-          modal: {
-            ondismiss: () => onFailure && onFailure('Payment cancelled by user.'),
-          },
-        };
-
-        // Razorpay SDK must be loaded: <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        const rzp = new Razorpay(options);
-        rzp.open();
-
-      } catch (err) {
-        onFailure && onFailure(err.message);
+        throw error;
       }
     },
   };
 
-  // ════════════════════════════════════════════════════════════
-  // 2. AUTH
-  // ════════════════════════════════════════════════════════════
-  const auth = {
-    login: async (email, password) => {
-      const res = await request('POST', '/auth/login', { email, password }, false);
-      setToken(res.data.token);
-      setUser(res.data.user);
-      return res.data;
-    },
-
-    logout: () => {
-      clearSession();
-      window.location.href = '/'; // Redirect to landing page
-    },
-
-    getMe: () => request('GET', '/auth/me'),
-
-    isLoggedIn: () => !!getToken(),
-    getUser,
-  };
-
-  // ════════════════════════════════════════════════════════════
-  // 3. MEALS (Student)
-  // ════════════════════════════════════════════════════════════
-  const meals = {
-    selectMeal: (breakfast, lunch, dinner) =>
-      request('POST', '/meals/select-meal', { breakfast, lunch, dinner }),
-
-    getMyMeals: () => request('GET', '/meals/my-meals'),
-
-    updateMeal: (updates) => request('PUT', '/meals/update-meal', updates),
-  };
-
-  // ════════════════════════════════════════════════════════════
-  // 4. ADMIN Dashboard
-  // ════════════════════════════════════════════════════════════
-  const admin = {
-    getStats:       () => request('GET', '/admin/stats'),
-    getUsers:       () => request('GET', '/admin/users'),
-    getDailyReport: () => request('GET', '/admin/daily-report'),
-    getPrediction:  () => request('GET', '/admin/prediction'),
-    addWaste:       (data) => request('POST', '/admin/add-waste', data),
-    getWaste:       (from, to) => {
-      const q = new URLSearchParams();
-      if (from) q.set('from', from);
-      if (to)   q.set('to', to);
-      return request('GET', `/admin/waste?${q}`);
-    },
-
-    // Pending payment approvals
-    getPendingPayments: () => request('GET', '/payment/pending'),
-    approve: (paymentId) => request('POST', `/approval/approve/${paymentId}`),
-    reject:  (paymentId) => request('POST', `/approval/reject/${paymentId}`),
-  };
-
-  // ════════════════════════════════════════════════════════════
-  // 5. STUDENTS (Mess Owner)
-  // ════════════════════════════════════════════════════════════
   const students = {
-    add:       (data)        => request('POST', '/students', data),
-    getAll:    ()            => request('GET',  '/students'),
-    getById:   (id)          => request('GET',  `/students/${id}`),
-    update:    (id, data)    => request('PUT',  `/students/${id}`, data),
-    delete:    (id)          => request('DELETE', `/students/${id}`),
-    getMeals:  (id)          => request('GET',  `/students/${id}/meals`),
-  };
-
-  // ════════════════════════════════════════════════════════════
-  // 6. MENU (Mess Owner)
-  // ════════════════════════════════════════════════════════════
-  const menu = {
-    setMenu:      (data)       => request('POST',   '/menu', data),
-    getToday:     ()           => request('GET',    '/menu/today'),
-    getByDate:    (date)       => request('GET',    `/menu/${date}`),
-    getRange:     (from, to)   => {
-      const q = new URLSearchParams();
-      if (from) q.set('from', from);
-      if (to)   q.set('to', to);
-      return request('GET', `/menu?${q}`);
+    add(data) {
+      return request('POST', '/students', { body: data });
     },
-    delete:       (date)       => request('DELETE', `/menu/${date}`),
+
+    getAll() {
+      return request('GET', '/students');
+    },
+
+    getById(studentId) {
+      return request('GET', `/students/${studentId}`);
+    },
+
+    update(studentId, data) {
+      return request('PUT', `/students/${studentId}`, { body: data });
+    },
+
+    delete(studentId) {
+      return request('DELETE', `/students/${studentId}`);
+    },
+
+    getMeals(studentId) {
+      return request('GET', `/students/${studentId}/meals`);
+    },
   };
 
-  // ════════════════════════════════════════════════════════════
-  // Public API
-  // ════════════════════════════════════════════════════════════
-  return { BASE_URL, payment, auth, meals, admin, students, menu, getToken, getUser };
+  const menu = {
+    getToday() {
+      return request('GET', '/menu/today');
+    },
 
-})();
+    getByDate(date) {
+      return request('GET', `/menu/${date}`);
+    },
 
-// Make available globally (or export for module environments)
-if (typeof module !== 'undefined') module.exports = SmartFeedAPI;
+    getRange(from, to) {
+      const query = new URLSearchParams();
+      if (from) {
+        query.set('from', from);
+      }
+      if (to) {
+        query.set('to', to);
+      }
+
+      const suffix = query.toString() ? `?${query.toString()}` : '';
+      return request('GET', `/menu${suffix}`);
+    },
+
+    set(data) {
+      return request('POST', '/menu', { body: data });
+    },
+
+    delete(date) {
+      return request('DELETE', `/menu/${date}`);
+    },
+  };
+
+  const owner = {
+    getStats() {
+      return request('GET', '/admin/stats');
+    },
+
+    getUsers() {
+      return request('GET', '/admin/users');
+    },
+
+    getDailyReport() {
+      return request('GET', '/admin/daily-report');
+    },
+
+    getPrediction() {
+      return request('GET', '/admin/prediction');
+    },
+
+    addWaste(data) {
+      return request('POST', '/admin/add-waste', { body: data });
+    },
+
+    getWaste(from, to) {
+      const query = new URLSearchParams();
+      if (from) {
+        query.set('from', from);
+      }
+      if (to) {
+        query.set('to', to);
+      }
+
+      const suffix = query.toString() ? `?${query.toString()}` : '';
+      return request('GET', `/admin/waste${suffix}`);
+    },
+
+    getPendingPayments() {
+      return request('GET', '/payment/pending');
+    },
+
+    approvePayment(paymentId) {
+      return request('POST', `/approval/approve/${paymentId}`);
+    },
+
+    rejectPayment(paymentId) {
+      return request('POST', `/approval/reject/${paymentId}`);
+    },
+
+    getPendingApprovals() {
+      return request('GET', '/approval/pending-users');
+    },
+
+    approveUser(userId) {
+      return request('POST', `/approval/approve-user/${userId}`);
+    },
+
+    rejectUser(userId) {
+      return request('POST', `/approval/reject-user/${userId}`);
+    },
+  };
+
+  const api = {
+    get BASE_URL() {
+      return baseUrl;
+    },
+    setBaseUrl,
+    request,
+    auth,
+    payment,
+    meals,
+    students,
+    menu,
+    owner,
+    admin: owner,
+    getToken,
+    getUser,
+    setToken,
+    setUser,
+    clearSession,
+    getDashboardPath,
+  };
+
+  global.SmartFeedAPI = api;
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = api;
+  }
+})(typeof window !== 'undefined' ? window : globalThis);
