@@ -1,0 +1,57 @@
+// firestore.rules — Firestore Security Rules for SmartFeed AI v2
+// Deploy via: firebase deploy --only firestore:rules
+// Or paste in Firebase Console → Firestore → Rules tab
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Users ────────────────────────────────────────────────
+    // Users can only read their own profile.
+    // All writes are server-side only (Admin SDK).
+    match /users/{userId} {
+      allow get:   if request.auth != null && request.auth.uid == userId;
+      allow list:  if false;
+      allow write: if false;
+    }
+
+    // ── Payments ─────────────────────────────────────────────
+    // Payments are fully server-side — no client reads/writes.
+    match /payments/{paymentId} {
+      allow read, write: if false;
+    }
+
+    // ── Meals ─────────────────────────────────────────────────
+    // Users can only read/write their own meal records.
+    match /meals/{mealId} {
+      allow read:   if request.auth != null &&
+                       resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null &&
+                       request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null &&
+                       resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // ── Students ─────────────────────────────────────────────
+    // Only accessible server-side (Admin SDK).
+    match /students/{studentId} {
+      allow read, write: if false;
+    }
+
+    // ── Menu ─────────────────────────────────────────────────
+    // Only authenticated users can read menus.
+    // Only server-side (Admin SDK) can write.
+    match /menu/{menuDate} {
+      allow read:  if request.auth != null;
+      allow write: if false;
+    }
+
+    // ── Waste ─────────────────────────────────────────────────
+    // Fully server-side.
+    match /waste/{wasteId} {
+      allow read, write: if false;
+    }
+  }
+}
+

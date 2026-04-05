@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "SmartFeed AI – Backend API",
+    "description": "Complete Postman collection for SmartFeed AI Mess Management Backend.\n\nSetup:\n1. Set `base_url` variable to: http://localhost:5000/api\n2. Run 'Signup' or 'Login' → copy the token from response\n3. Set `auth_token` variable to that token\n4. All protected requests will use it automatically",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",   "value": "http://localhost:5000/api", "type": "string" },
+    { "key": "auth_token", "value": "PASTE_YOUR_JWT_TOKEN_HERE",  "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🔑 Auth",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health"
+          }
+        },
+        {
+          "name": "Signup (Student)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/signup",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ravi Kumar\",\n  \"usn\": \"1RV21CS042\",\n  \"email\": \"ravi@example.com\",\n  \"password\": \"securepass123\",\n  \"role\": \"student\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Signup (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/signup",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mess Admin\",\n  \"usn\": \"ADMIN001\",\n  \"email\": \"admin@smartfeed.com\",\n  \"password\": \"adminpass123\",\n  \"role\": \"admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ravi@example.com\",\n  \"password\": \"securepass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Profile (Protected)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{auth_token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🍽️ Meals (Student)",
+      "item": [
+        {
+          "name": "Select Meal for Today",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/meals/select-meal",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"breakfast\": true,\n  \"lunch\": true,\n  \"dinner\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Meals",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/meals/my-meals",
+            "header": [{ "key": "Authorization", "value": "Bearer {{auth_token}}" }]
+          }
+        },
+        {
+          "name": "Update Today's Meal",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/meals/update-meal",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dinner\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛡️ Admin",
+      "item": [
+        {
+          "name": "Get Today's Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/stats",
+            "header": [{ "key": "Authorization", "value": "Bearer {{auth_token}}" }]
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/users",
+            "header": [{ "key": "Authorization", "value": "Bearer {{auth_token}}" }]
+          }
+        },
+        {
+          "name": "Get Daily Report",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/daily-report",
+            "header": [{ "key": "Authorization", "value": "Bearer {{auth_token}}" }]
+          }
+        },
+        {
+          "name": "Get AI Prediction",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/prediction",
+            "header": [{ "key": "Authorization", "value": "Bearer {{auth_token}}" }]
+          }
+        },
+        {
+          "name": "Add Waste Record",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/admin/add-waste",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mealType\": \"lunch\",\n  \"quantity\": 12.5,\n  \"unit\": \"kg\",\n  \"notes\": \"Excess rice and dal\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Waste Records",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/waste?from=2024-01-01&to=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "waste"],
+              "query": [
+                { "key": "from", "value": "2024-01-01" },
+                { "key": "to",   "value": "2024-12-31" }
+              ]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{auth_token}}" }]
+          }
+        }
+      ]
+    }
+  ]
+}
