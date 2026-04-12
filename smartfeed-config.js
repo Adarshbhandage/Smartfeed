@@ -20,6 +20,15 @@
   global.SMARTFEED_CONFIG = Object.assign(
     {
       apiBase: isLocal ? 'http://localhost:5000' : '__SMARTFEED_BACKEND_URL__',
+      supportEmail: 'gmail-smartfeed06@gmail.com',
+      adminEmail: 'gmail-smartfeed06@gmail.com',
+      payment: {
+        receiverName: 'State Bank of India - 3135',
+        receiverLabel: 'Primary account for receiving money',
+        upiId: '6361767974@ybl',
+        qrImage: 'payment-qr.jpeg',
+        note: 'Use this official SmartFeed QR for registration and confirmation-related payments.',
+      },
     },
     existing
   );

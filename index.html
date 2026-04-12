@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -66,6 +66,42 @@
             100% {
                 background-position: 0% 50%;
             }
+        }
+
+        /* ── LENIS & GSAP PARALLAX UTILS ── */
+        html.lenis,
+        html.lenis body {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        .lenis.lenis-smooth iframe {
+            pointer-events: none;
+        }
+
+        .parallax-bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: -1;
+            will-change: transform;
+        }
+
+        .parallax-section {
+            position: relative;
         }
 
         body {
@@ -670,6 +706,198 @@
             margin-top: 4px;
         }
 
+        .sf-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(2, 20, 14, 0.82);
+            backdrop-filter: blur(18px);
+            z-index: 1200;
+        }
+
+        .sf-modal.active {
+            display: flex;
+        }
+
+        .sf-modal-card {
+            width: min(920px, 100%);
+            max-height: calc(100vh - 48px);
+            overflow: auto;
+            background: rgba(255, 255, 255, 0.08);
+            border: var(--glass-border);
+            border-top: var(--glass-border-t);
+            box-shadow: var(--glass-shadow);
+            border-radius: 28px;
+            padding: 28px;
+        }
+
+        .sf-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .sf-close {
+            background: none;
+            border: none;
+            color: var(--white-40);
+            font-size: 1.7rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .sf-step {
+            display: none;
+        }
+
+        .sf-step.active {
+            display: block;
+        }
+
+        .sf-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .sf-field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .sf-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .sf-field label {
+            font-size: 0.78rem;
+            color: var(--white-70);
+            font-weight: 600;
+        }
+
+        .sf-field input,
+        .sf-field textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--white);
+            font: inherit;
+            outline: none;
+        }
+
+        .sf-field textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+
+        .sf-field input::placeholder,
+        .sf-field textarea::placeholder {
+            color: var(--white-40);
+        }
+
+        .sf-submit {
+            width: 100%;
+            margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 18px;
+            background: var(--lime);
+            color: #0d1f12;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .sf-submit.secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white-70);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .sf-message {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            line-height: 1.55;
+        }
+
+        .sf-message.show {
+            display: block;
+        }
+
+        .sf-message.success {
+            background: rgba(74, 222, 128, 0.12);
+            border: 1px solid rgba(74, 222, 128, 0.24);
+            color: #d8ffe6;
+        }
+
+        .sf-message.error {
+            background: rgba(248, 113, 113, 0.12);
+            border: 1px solid rgba(248, 113, 113, 0.24);
+            color: #ffd5d5;
+        }
+
+        .sf-payment-shell {
+            display: grid;
+            grid-template-columns: 0.92fr 1.08fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .sf-qr-card {
+            padding: 14px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sf-qr-card img {
+            width: 100%;
+            display: block;
+            border-radius: 16px;
+        }
+
+        .sf-meta {
+            display: grid;
+            gap: 12px;
+        }
+
+        .sf-meta-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sf-meta-item .label {
+            color: var(--white-40);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .sf-meta-item .value {
+            color: var(--white);
+            text-align: right;
+            font-size: 0.92rem;
+        }
+
         /* ── CTA SECTION ── */
         .cta-wrap {
             text-align: center;
@@ -896,28 +1124,55 @@
             font-size: 1.3rem;
         }
 
-        /* ── SCROLL REVEAL ── */
+        /* ── SCROLL REVEAL (GSAP) & PARALLAX ── */
         .reveal {
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 0.65s ease, transform 0.65s ease;
+            visibility: hidden;
+            will-change: transform, opacity, clip-path;
         }
 
-        .reveal.d1 {
-            transition-delay: 0.1s;
+        .clip-reveal {
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+            will-change: transform, opacity, clip-path;
+            visibility: hidden;
         }
 
-        .reveal.d2 {
-            transition-delay: 0.2s;
+        .parallax-layer {
+            will-change: transform;
         }
 
-        .reveal.d3 {
-            transition-delay: 0.3s;
+        /* ── MARQUEE TAGLINE ── */
+        .marquee-section {
+            padding: 40px 0;
+            overflow: hidden;
+            background: transparent;
+            border-top: var(--glass-border);
+            border-bottom: var(--glass-border);
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(8px);
         }
 
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .marquee-track {
+            display: flex;
+            white-space: nowrap;
+            will-change: transform;
+        }
+
+        .marquee-text {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--white-40);
+            padding: 0 40px;
+        }
+
+        .marquee-text span.filled {
+            color: var(--lime);
+            -webkit-text-stroke: 0;
+            font-style: italic;
         }
 
         /* ── MOBILE MENU ── */
@@ -962,6 +1217,49 @@
             cursor: pointer;
         }
 
+        /* ── DESKTOP PINNED SECTION ── */
+        @media (min-width: 961px) {
+            #how.pin-wrapper {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                overflow: hidden;
+                padding: 0;
+            }
+
+            #how .section-inner {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            #how .how-title,
+            #how .how-sub {
+                max-width: 1200px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #how .steps-container {
+                padding-left: max(24px, calc((100vw - 1200px) / 2));
+                overflow: hidden;
+            }
+
+            #how .steps-row {
+                display: flex !important;
+                flex-wrap: nowrap;
+                width: max-content;
+                gap: 40px;
+                padding-right: 24px;
+                padding-bottom: 20px;
+            }
+
+            #how .step-card {
+                width: 400px;
+                flex-shrink: 0;
+            }
+        }
+
         /* ── RESPONSIVE ── */
         @media (max-width: 960px) {
             .hero {
@@ -988,6 +1286,11 @@
                 margin: 0 auto;
             }
 
+            .sf-grid,
+            .sf-payment-shell {
+                grid-template-columns: 1fr;
+            }
+
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 32px;
@@ -997,7 +1300,8 @@
         @media (max-width: 600px) {
 
             .nav-links,
-            .nav-cta {
+            .nav-cta,
+            .nav-auth-btns {
                 display: none;
             }
 
@@ -1039,13 +1343,142 @@
                 align-items: flex-start;
             }
 
-            .stat-chip.top-right {
-                right: 4px;
+            .hero-visual {
+                padding-bottom: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
             }
 
-            .stat-chip.bottom-left {
-                left: 4px;
+            .stat-chip {
+                position: relative !important;
+                top: auto !important;
+                bottom: auto !important;
+                left: auto !important;
+                right: auto !important;
+                transform: none !important;
+                width: 100%;
             }
+        }
+
+        /* ── MODALS ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(13, 31, 18, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            border-top: var(--glass-border-t);
+            box-shadow: var(--glass-shadow);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--white-70);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--white);
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .modal-subtitle {
+            font-size: 0.9rem;
+            color: var(--white-70);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--white-70);
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, background 0.2s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--lime);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-btn {
+            width: 100%;
+            background: var(--lime);
+            color: #0d1f12;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .form-btn:hover {
+            background: var(--lime-hover);
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -1063,7 +1496,11 @@
             <li><a href="dashboard-owner.html">For Mess Owners</a></li>
             <li><a href="dashboard-student.html">Students Dashboard</a></li>
         </ul>
-        <a href="dashboard-student.html" class="nav-cta">Get Started</a>
+        <div class="nav-auth-btns" style="display:flex; gap:12px; align-items:center;">
+            <button class="btn-ghost" onclick="openLoginModal()"
+                style="background:transparent; border:none; font-family:var(--font-display); font-weight:600; font-size:0.9rem;">Login</button>
+            <button class="nav-cta" onclick="openCreateAccountModal()">Create Account</button>
+        </div>
         <button class="hamburger" id="ham" aria-label="Menu">
             <span></span><span></span><span></span>
         </button>
@@ -1076,12 +1513,18 @@
         <a href="#features" onclick="closeNav()">For Students</a>
         <a href="dashboard-owner.html" onclick="closeNav()">Mess Owners</a>
         <a href="dashboard-student.html" onclick="closeNav()">Students Dashboard</a>
-        <a href="dashboard-student.html" class="nav-cta" style="margin-top:8px">Get Started</a>
+        <a href="#" onclick="closeNav(); openLoginModal()" style="margin-top:8px; color:var(--lime);">Login</a>
+        <button onclick="closeNav(); openCreateAccountModal()"
+            style="background:var(--lime); color:#0d1f12; padding:12px 32px; border-radius:var(--radius-xl); font-weight:700; font-size:1.1rem; border:none; cursor:pointer;">Create
+            Account</button>
     </div>
 
     <!-- HERO -->
     <main>
-        <section style="background:transparent">
+        <section style="background:transparent" class="parallax-section">
+            <div class="parallax-bg-orb"
+                style="top:-10%; right:-10%; width:600px; height:600px; background:radial-gradient(circle, rgba(132,204,22,0.15) 0%, transparent 70%);"
+                data-speed="0.05"></div>
             <div class="hero">
                 <!-- LEFT -->
                 <div class="hero-left glass-panel">
@@ -1135,8 +1578,25 @@
             </div>
         </section>
 
+        <!-- MARQUEE -->
+        <section class="marquee-section">
+            <div class="marquee-track">
+                <div class="marquee-text">STOP COOKING FOR <span class="filled">GHOSTS</span> • COOK WITH <span
+                        class="filled">DATA</span> • </div>
+                <div class="marquee-text">STOP COOKING FOR <span class="filled">GHOSTS</span> • COOK WITH <span
+                        class="filled">DATA</span> • </div>
+                <div class="marquee-text">STOP COOKING FOR <span class="filled">GHOSTS</span> • COOK WITH <span
+                        class="filled">DATA</span> • </div>
+                <div class="marquee-text">STOP COOKING FOR <span class="filled">GHOSTS</span> • COOK WITH <span
+                        class="filled">DATA</span> • </div>
+            </div>
+        </section>
+
         <!-- FEATURES -->
-        <section class="section" id="features" style="background:transparent">
+        <section class="section parallax-section" id="features" style="background:transparent">
+            <div class="parallax-bg-orb"
+                style="top:20%; left:-15%; width:700px; height:700px; background:radial-gradient(circle, rgba(13,148,136,0.12) 0%, transparent 70%);"
+                data-speed="-0.03"></div>
             <div class="section-inner">
                 <div class="features-grid">
 
@@ -1202,57 +1662,65 @@
         </section>
 
         <!-- HOW IT WORKS -->
-        <section class="section how-bg" id="how">
+        <section class="section how-bg parallax-section pin-wrapper" id="how">
+            <div class="parallax-bg-orb"
+                style="top:50%; right:-10%; width:500px; height:500px; background:radial-gradient(circle, rgba(74,222,128,0.1) 0%, transparent 70%);"
+                data-speed="0.04"></div>
             <div class="section-inner">
                 <h2 class="how-title reveal">Stupid Simple. Seriously Impactful.</h2>
                 <p class="how-sub reveal">Three steps. No training needed. Real change.</p>
-                <div class="steps-row">
+                <div class="steps-container">
+                    <div class="steps-row" id="stepsTrack">
 
-                    <div class="step-card reveal">
-                        <img class="step-img"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY38bu0qV_DJq7XTIQ6vZomPrDnotHAU0JKjYfYL3hkKWiJRKsNGPjolSSCr9oaiqtV4pUPt_tWd2zP2xSqesV7J4SHYp9tbZAVYmi1-H_js8qvb91qHIgynCArI4g8J7BNCnCR4uKt6H22fNqNqVvke9uAFU9FqxLmZjoErQ_aN8Qn2BEiZ5xXjwfsII9M2tvokp1ehDcEiGQtKeKdG4U0mWOzW7Ff8kd_CjrmPrR9acgsruHyM3nH-BXXRzKfl4yfLPAIghv-4Y"
-                            alt="Student logs in" onerror="this.style.display='none'" />
-                        <div class="step-body">
-                            <div class="step-num">Step 01</div>
-                            <h3>Student Logs In</h3>
-                            <p>Access the SmartFeed portal via mobile or browser. A fast, single-sign-on experience
-                                built for campus life.</p>
-                            <div class="step-icon-row"><span class="material-icons">login</span></div>
+                        <div class="step-card reveal">
+                            <img class="step-img"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY38bu0qV_DJq7XTIQ6vZomPrDnotHAU0JKjYfYL3hkKWiJRKsNGPjolSSCr9oaiqtV4pUPt_tWd2zP2xSqesV7J4SHYp9tbZAVYmi1-H_js8qvb91qHIgynCArI4g8J7BNCnCR4uKt6H22fNqNqVvke9uAFU9FqxLmZjoErQ_aN8Qn2BEiZ5xXjwfsII9M2tvokp1ehDcEiGQtKeKdG4U0mWOzW7Ff8kd_CjrmPrR9acgsruHyM3nH-BXXRzKfl4yfLPAIghv-4Y"
+                                alt="Student logs in" onerror="this.style.display='none'" />
+                            <div class="step-body">
+                                <div class="step-num">Step 01</div>
+                                <h3>Student Logs In</h3>
+                                <p>Access the SmartFeed portal via mobile or browser. A fast, single-sign-on experience
+                                    built for campus life.</p>
+                                <div class="step-icon-row"><span class="material-icons">login</span></div>
+                            </div>
+                        </div>
+
+                        <div class="step-card reveal d1">
+                            <img class="step-img"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVknJgIVKYLz-pP8fz6zil48Pqw7xf_1cridHSDdYNeZQbDoUe81Aerl0AFeW_Uim7Ja7f5ZMACmyP2ruuqIN2AKuCk3qxu1u7oxpantXX_vgbLkEuPb0DijMQRMTD-MZs6sqJgLUYhK7K99q605jWQOvadPG-66WDZl_pSQYnX5mi9gReu4W-71WvoLsVdDsNXS46bFZoKGvdUsd-KN3DZHFp9XvdEvSZA4GIYOOqmHmyY5n-vtrrC7nbqhzbIjY1rDzaQG_3YMo"
+                                alt="Marks attendance" onerror="this.style.display='none'" />
+                            <div class="step-body">
+                                <div class="step-num">Step 02</div>
+                                <h3>Marks Attendance</h3>
+                                <p>One tap to confirm. Mark Yes or No for breakfast, lunch, and dinner — before the
+                                    daily
+                                    cutoff. Zero friction.</p>
+                                <div class="step-icon-row"><span class="material-icons">how_to_reg</span></div>
+                            </div>
+                        </div>
+
+                        <div class="step-card reveal d2">
+                            <img class="step-img"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD72e2jUUSZKnBjxZGRzkypr3Gfi3yY0DfZKGw2lzIXhqBA2JBwbb132-jACAulfanE3v0YvIHv3i4SwduV36Vpsgpt4jh9pQXBeTvX6FYq1fs4Ds2M6XxEO8Y9AMJ6S6DYch4k-Chg7UqtDMo6Oc0Ms4TaFpMkD1tMR2bRsdPGSfSBtBmGmhGZJWKyO9FRMLIhO_ZIZWJbXJEzVI1tnjjMm_z9kb7WhF1m6_GLj8jYehI4AdKYnTA4W-O8ECZMgUZCWiAYWgI2wDw"
+                                alt="Mess owner prepares" onerror="this.style.display='none'" />
+                            <div class="step-body">
+                                <div class="step-num">Step 03</div>
+                                <h3>Mess Owner Prepares</h3>
+                                <p>Real-time headcounts delivered to the kitchen. No more guesswork — just accurately
+                                    portioned meals.</p>
+                                <div class="step-icon-row"><span class="material-icons">cooking</span></div>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="step-card reveal d1">
-                        <img class="step-img"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVknJgIVKYLz-pP8fz6zil48Pqw7xf_1cridHSDdYNeZQbDoUe81Aerl0AFeW_Uim7Ja7f5ZMACmyP2ruuqIN2AKuCk3qxu1u7oxpantXX_vgbLkEuPb0DijMQRMTD-MZs6sqJgLUYhK7K99q605jWQOvadPG-66WDZl_pSQYnX5mi9gReu4W-71WvoLsVdDsNXS46bFZoKGvdUsd-KN3DZHFp9XvdEvSZA4GIYOOqmHmyY5n-vtrrC7nbqhzbIjY1rDzaQG_3YMo"
-                            alt="Marks attendance" onerror="this.style.display='none'" />
-                        <div class="step-body">
-                            <div class="step-num">Step 02</div>
-                            <h3>Marks Attendance</h3>
-                            <p>One tap to confirm. Mark Yes or No for breakfast, lunch, and dinner — before the daily
-                                cutoff. Zero friction.</p>
-                            <div class="step-icon-row"><span class="material-icons">how_to_reg</span></div>
-                        </div>
-                    </div>
-
-                    <div class="step-card reveal d2">
-                        <img class="step-img"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD72e2jUUSZKnBjxZGRzkypr3Gfi3yY0DfZKGw2lzIXhqBA2JBwbb132-jACAulfanE3v0YvIHv3i4SwduV36Vpsgpt4jh9pQXBeTvX6FYq1fs4Ds2M6XxEO8Y9AMJ6S6DYch4k-Chg7UqtDMo6Oc0Ms4TaFpMkD1tMR2bRsdPGSfSBtBmGmhGZJWKyO9FRMLIhO_ZIZWJbXJEzVI1tnjjMm_z9kb7WhF1m6_GLj8jYehI4AdKYnTA4W-O8ECZMgUZCWiAYWgI2wDw"
-                            alt="Mess owner prepares" onerror="this.style.display='none'" />
-                        <div class="step-body">
-                            <div class="step-num">Step 03</div>
-                            <h3>Mess Owner Prepares</h3>
-                            <p>Real-time headcounts delivered to the kitchen. No more guesswork — just accurately
-                                portioned meals.</p>
-                            <div class="step-icon-row"><span class="material-icons">cooking</span></div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </section>
 
         <!-- MISSION -->
-        <section class="section mission-bg">
+        <section class="section mission-bg parallax-section">
+            <div class="parallax-bg-orb"
+                style="bottom:-20%; left:50%; transform:translateX(-50%); width:800px; height:400px; background:radial-gradient(ellipse, rgba(34,197,94,0.1) 0%, transparent 70%);"
+                data-speed="-0.02"></div>
             <div class="section-inner glass-panel">
                 <blockquote class="mission reveal">
                     In India, over 40% of food produced never reaches a plate. We're changing that — one hostel at a
@@ -1283,12 +1751,164 @@
                     more sustainable. It starts with one tap.</p>
                 <div class="cta-btns reveal">
                     <a href="dashboard-student.html" class="btn-primary">Mark Today's Meals</a>
-                    <a href="dashboard-owner.html" class="btn-outline">Partner with Us</a>
+                    <a href="#" class="btn-outline" onclick="openOwnerOnboardingModal(); return false;">Partner with Us</a>
                 </div>
             </div>
         </div>
 
+        <!-- MODALS -->
+        <div class="modal-overlay" id="loginModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModals()">&times;</button>
+                <h2 class="modal-title">Welcome Back</h2>
+                <p class="modal-subtitle">Login to your SmartFeed account</p>
+                <form id="loginForm" onsubmit="handleAuth(event)">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-input" required placeholder="student@college.edu">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-input" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="form-btn">Login</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="createAccountModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModals()">&times;</button>
+                <h2 class="modal-title">Create Account</h2>
+                <p class="modal-subtitle">Join SmartFeed and make an impact</p>
+                <form id="createAccountForm" onsubmit="handleAuth(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" class="form-input" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-input" required placeholder="student@college.edu">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-input" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="form-btn">Create Account</button>
+                </form>
+            </div>
+        </div>
+
     </main>
+
+    <div class="sf-modal" id="loginModal">
+        <div class="sf-modal-card">
+            <div class="sf-modal-header">
+                <div>
+                    <h3 id="loginModalTitle">Student Login</h3>
+                    <p id="loginModalText" style="color:var(--white-70);line-height:1.6;">Open SmartFeed and mark attendance for today's meals.</p>
+                </div>
+                <button class="sf-close" type="button" onclick="closeSmartFeedModal('loginModal')">×</button>
+            </div>
+            <div class="sf-field full">
+                <label for="loginEmail">Email</label>
+                <input id="loginEmail" type="email" placeholder="student@example.com" />
+            </div>
+            <div class="sf-field full">
+                <label for="loginPassword">Password</label>
+                <input id="loginPassword" type="password" placeholder="Enter your password" />
+            </div>
+            <div id="loginMessage" class="sf-message"></div>
+            <button id="loginSubmitBtn" class="sf-submit" type="button" onclick="doSmartFeedLogin()">Login</button>
+        </div>
+    </div>
+
+    <div class="sf-modal" id="ownerModal">
+        <div class="sf-modal-card">
+            <div class="sf-modal-header">
+                <div>
+                    <h3>Owner Onboarding</h3>
+                    <p style="color:var(--white-70);line-height:1.6;">Create your mess owner account, pay through QR, and submit the confirmation for manual approval.</p>
+                </div>
+                <button class="sf-close" type="button" onclick="closeSmartFeedModal('ownerModal')">×</button>
+            </div>
+
+            <div class="sf-step active" id="ownerSignupStep">
+                <div class="sf-grid">
+                    <div class="sf-field">
+                        <label for="ownerBusinessName">Mess / business name</label>
+                        <input id="ownerBusinessName" type="text" placeholder="Green Leaf Hostel Mess" />
+                    </div>
+                    <div class="sf-field">
+                        <label for="ownerHostelName">Hostel name</label>
+                        <input id="ownerHostelName" type="text" placeholder="Green Leaf Hostel" />
+                    </div>
+                    <div class="sf-field">
+                        <label for="ownerContactName">Owner name</label>
+                        <input id="ownerContactName" type="text" placeholder="Adarsh Bhandage" />
+                    </div>
+                    <div class="sf-field">
+                        <label for="ownerPhone">Phone</label>
+                        <input id="ownerPhone" type="tel" placeholder="9876543210" />
+                    </div>
+                    <div class="sf-field">
+                        <label for="ownerEmail">Email</label>
+                        <input id="ownerEmail" type="email" placeholder="owner@example.com" />
+                    </div>
+                    <div class="sf-field">
+                        <label for="ownerPassword">Password</label>
+                        <input id="ownerPassword" type="password" placeholder="Minimum 6 characters" />
+                    </div>
+                    <div class="sf-field full">
+                        <label for="ownerAddress">Address</label>
+                        <textarea id="ownerAddress" placeholder="Mess or hostel address"></textarea>
+                    </div>
+                </div>
+                <div id="ownerSignupMessage" class="sf-message"></div>
+                <button id="ownerSignupBtn" class="sf-submit" type="button" onclick="doOwnerSignup()">Create Owner Account</button>
+                <button class="sf-submit secondary" type="button" onclick="openStudentLogin('dashboard-owner.html')">Already approved? Owner login</button>
+            </div>
+
+            <div class="sf-step" id="ownerPaymentStep">
+                <div class="sf-payment-shell">
+                    <div class="sf-qr-card">
+                        <img id="ownerQrImage" src="" alt="SmartFeed payment QR" />
+                    </div>
+                    <div class="sf-meta">
+                        <div class="sf-meta-item">
+                            <span class="label">Registration amount</span>
+                            <span class="value" id="ownerPaymentAmount">INR 1.00</span>
+                        </div>
+                        <div class="sf-meta-item">
+                            <span class="label">UPI ID</span>
+                            <span class="value" id="ownerPaymentUpi">Loading...</span>
+                        </div>
+                        <div class="sf-meta-item">
+                            <span class="label">Payment note</span>
+                            <span class="value" id="ownerPaymentNote">Loading...</span>
+                        </div>
+                        <div class="sf-meta-item">
+                            <span class="label">Account</span>
+                            <span class="value" id="ownerPaymentMeta">Loading owner details...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sf-grid" style="margin-top:18px;">
+                    <div class="sf-field">
+                        <label for="ownerTransactionId">UPI transaction ID</label>
+                        <input id="ownerTransactionId" type="text" placeholder="Collect this after payment" />
+                    </div>
+                    <div class="sf-field">
+                        <label for="ownerPaymentNotes">Notes for admin</label>
+                        <input id="ownerPaymentNotes" type="text" placeholder="Optional notes" />
+                    </div>
+                </div>
+                <div id="ownerPaymentMessage" class="sf-message"></div>
+                <button id="ownerPaymentBtn" class="sf-submit" type="button" onclick="submitOwnerPaymentConfirmation()">Send Confirmation for Approval</button>
+                <button class="sf-submit secondary" type="button" onclick="closeSmartFeedModal('ownerModal')">I will finish this later</button>
+            </div>
+        </div>
+    </div>
 
     <!-- FOOTER -->
     <footer>
@@ -1311,14 +1931,14 @@
                 <ul>
                     <li><a href="#">About</a></li>
                     <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a id="footerContactLink" href="mailto:gmail-smartfeed06@gmail.com">Contact</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Connect</h4>
                 <div class="footer-icons">
                     <a href="#" title="Website"><span class="material-icons">public</span></a>
-                    <a href="#" title="Email"><span class="material-icons">mail</span></a>
+                    <a id="footerEmailLink" href="mailto:gmail-smartfeed06@gmail.com" title="Email"><span class="material-icons">mail</span></a>
                     <a href="#" title="Share"><span class="material-icons">share</span></a>
                 </div>
             </div>
@@ -1350,17 +1970,643 @@
         </div>
     </nav>
 
+    <!-- GSAP & Lenis -->
+    <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="smartfeed-config.js"></script>
+    <script src="smartfeed-api.js"></script>
+
     <script>
-        // Nav scroll
+        // Nav mobile menu
         document.getElementById('ham').addEventListener('click', () => document.getElementById('mobileNav').classList.add('open'));
         document.getElementById('mobileClose').addEventListener('click', () => document.getElementById('mobileNav').classList.remove('open'));
         function closeNav() { document.getElementById('mobileNav').classList.remove('open'); }
 
-        // Reveal
-        const obs = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-        }, { threshold: 0.12 });
-        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+        // Modals Logic
+        function openLoginModal() {
+            openStudentLogin();
+        }
+
+        function openCreateAccountModal() {
+            closeModals();
+            document.getElementById('createAccountModal').classList.add('active');
+        }
+
+        function closeModals() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('createAccountModal').classList.remove('active');
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('.form-btn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Processing...';
+            btn.style.opacity = '0.7';
+            setTimeout(() => {
+                alert("Success! Re-directing to your dashboard.");
+                window.location.href = "dashboard-student.html";
+            }, 800);
+        }
+
+        const OWNER_ONBOARDING_KEY = 'sf_owner_onboarding';
+
+        function setSmartFeedModalState(id, isOpen) {
+            document.querySelectorAll(`.sf-modal[id="${id}"]`).forEach((node) => {
+                node.classList.toggle('active', isOpen);
+            });
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        }
+
+        function closeSmartFeedModal(id) {
+            setSmartFeedModalState(id, false);
+        }
+
+        function openOwnerOnboardingModal() {
+            closeModals();
+            setSmartFeedModalState('ownerModal', true);
+            loadOwnerPaymentConfig();
+            syncOwnerOnboardingState();
+        }
+
+        function openStudentLogin(targetPath) {
+            closeModals();
+            window.SMARTFEED_LOGIN_NEXT = targetPath || 'dashboard-student.html';
+            setSmartFeedModalState('loginModal', true);
+        }
+
+        function readOwnerOnboardingState() {
+            try {
+                return JSON.parse(localStorage.getItem(OWNER_ONBOARDING_KEY) || 'null');
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function writeOwnerOnboardingState(state) {
+            localStorage.setItem(OWNER_ONBOARDING_KEY, JSON.stringify(state));
+        }
+
+        function setOwnerStep(step) {
+            document.getElementById('ownerSignupStep').classList.toggle('active', step === 'signup');
+            document.getElementById('ownerPaymentStep').classList.toggle('active', step === 'payment');
+        }
+
+        function setOwnerMessage(elementId, message, type) {
+            const node = document.getElementById(elementId);
+            if (!node) {
+                return;
+            }
+
+            node.textContent = message;
+            node.className = `sf-message show ${type}`;
+        }
+
+        function clearOwnerMessage(elementId) {
+            const node = document.getElementById(elementId);
+            if (!node) {
+                return;
+            }
+
+            node.textContent = '';
+            node.className = 'sf-message';
+        }
+
+        function setButtonBusy(buttonId, busy, busyText, idleText) {
+            const button = document.getElementById(buttonId);
+            if (!button) {
+                return;
+            }
+
+            button.disabled = busy;
+            button.style.opacity = busy ? '0.75' : '1';
+            button.textContent = busy ? busyText : idleText;
+        }
+
+        function syncOwnerOnboardingState() {
+            const state = readOwnerOnboardingState();
+            const metaNode = document.getElementById('ownerPaymentMeta');
+            if (!metaNode) {
+                return;
+            }
+
+            if (!state || !state.userId || !state.userEmail) {
+                metaNode.textContent = 'Create the owner account first to attach this payment to your request.';
+                setOwnerStep('signup');
+                return;
+            }
+
+            metaNode.textContent = `${state.businessName || state.name || 'Pending owner'} · ${state.userEmail} · Request ID ${state.userId}`;
+            setOwnerStep('payment');
+        }
+
+        async function loadOwnerPaymentConfig() {
+            const fallback = (window.SMARTFEED_CONFIG && window.SMARTFEED_CONFIG.payment) || {};
+            const fallbackSupport = (window.SMARTFEED_CONFIG && (window.SMARTFEED_CONFIG.supportEmail || window.SMARTFEED_CONFIG.adminEmail)) || 'gmail-smartfeed06@gmail.com';
+
+            const applyConfig = (config) => {
+                const amount = typeof config.amount === 'number' ? config.amount : 100;
+                const supportEmail = config.supportEmail || fallbackSupport;
+
+                document.getElementById('ownerQrImage').src = config.qrImageUrl || fallback.qrImage || 'payment-qr.jpeg';
+                document.getElementById('ownerPaymentAmount').textContent = `INR ${(amount / 100).toFixed(2)}`;
+                document.getElementById('ownerPaymentUpi').textContent = config.upiId || fallback.upiId || '6361767974@ybl';
+                document.getElementById('ownerPaymentNote').textContent = config.note || fallback.note || 'SmartFeed owner registration';
+
+                if (supportEmail) {
+                    const footerContact = document.getElementById('footerContactLink');
+                    const footerEmail = document.getElementById('footerEmailLink');
+                    [footerContact, footerEmail].forEach((node) => {
+                        if (node) {
+                            node.href = `mailto:${supportEmail}`;
+                        }
+                    });
+                }
+            };
+
+            try {
+                const response = await SmartFeedAPI.payment.getOwnerConfig();
+                applyConfig(response.data || {});
+            } catch (error) {
+                applyConfig({});
+            }
+        }
+
+        async function doOwnerSignup() {
+            clearOwnerMessage('ownerSignupMessage');
+
+            const payload = {
+                businessName: document.getElementById('ownerBusinessName').value.trim(),
+                hostelName: document.getElementById('ownerHostelName').value.trim(),
+                name: document.getElementById('ownerContactName').value.trim(),
+                phone: document.getElementById('ownerPhone').value.trim(),
+                email: document.getElementById('ownerEmail').value.trim(),
+                password: document.getElementById('ownerPassword').value,
+                address: document.getElementById('ownerAddress').value.trim(),
+                role: 'mess_owner',
+            };
+
+            if (!payload.name || !payload.email || !payload.password) {
+                setOwnerMessage('ownerSignupMessage', 'Owner name, email, and password are required.', 'error');
+                return;
+            }
+
+            setButtonBusy('ownerSignupBtn', true, 'Creating owner account...', 'Create Owner Account');
+
+            try {
+                const result = await SmartFeedAPI.auth.signup(payload);
+                writeOwnerOnboardingState({
+                    userId: result.user.uid,
+                    userEmail: result.user.email,
+                    name: payload.name,
+                    businessName: payload.businessName,
+                });
+                setOwnerMessage('ownerSignupMessage', 'Owner request created. Pay with the QR on the next step and submit your transaction ID for approval.', 'success');
+                syncOwnerOnboardingState();
+            } catch (error) {
+                setOwnerMessage('ownerSignupMessage', error.message, 'error');
+            } finally {
+                setButtonBusy('ownerSignupBtn', false, 'Creating owner account...', 'Create Owner Account');
+            }
+        }
+
+        async function submitOwnerPaymentConfirmation() {
+            clearOwnerMessage('ownerPaymentMessage');
+
+            const state = readOwnerOnboardingState();
+            if (!state || !state.userId || !state.userEmail) {
+                setOwnerMessage('ownerPaymentMessage', 'Create the owner request first, then come back here to send the payment confirmation.', 'error');
+                return;
+            }
+
+            const transactionId = document.getElementById('ownerTransactionId').value.trim();
+            const notes = document.getElementById('ownerPaymentNotes').value.trim();
+
+            if (!transactionId) {
+                setOwnerMessage('ownerPaymentMessage', 'UPI transaction ID is required.', 'error');
+                return;
+            }
+
+            setButtonBusy('ownerPaymentBtn', true, 'Sending confirmation...', 'Send Confirmation for Approval');
+
+            try {
+                await SmartFeedAPI.payment.confirmOwnerRegistration({
+                    userId: state.userId,
+                    userEmail: state.userEmail,
+                    transactionId,
+                    notes,
+                });
+                setOwnerMessage('ownerPaymentMessage', 'Payment confirmation sent. The SmartFeed admin inbox will receive your request for review.', 'success');
+                document.getElementById('ownerTransactionId').value = '';
+                document.getElementById('ownerPaymentNotes').value = '';
+            } catch (error) {
+                setOwnerMessage('ownerPaymentMessage', error.message, 'error');
+            } finally {
+                setButtonBusy('ownerPaymentBtn', false, 'Sending confirmation...', 'Send Confirmation for Approval');
+            }
+        }
+
+        async function doSmartFeedLogin() {
+            clearOwnerMessage('loginMessage');
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                setOwnerMessage('loginMessage', 'Email and password are required.', 'error');
+                return;
+            }
+
+            setButtonBusy('loginSubmitBtn', true, 'Logging in...', 'Login');
+
+            try {
+                const result = await SmartFeedAPI.auth.login(email, password);
+                const nextPath = window.SMARTFEED_LOGIN_NEXT || SmartFeedAPI.getDashboardPath(result.user);
+                window.location.href = nextPath;
+            } catch (error) {
+                setOwnerMessage('loginMessage', error.message, 'error');
+            } finally {
+                setButtonBusy('loginSubmitBtn', false, 'Logging in...', 'Login');
+            }
+        }
+
+        syncOwnerOnboardingState();
+        loadOwnerPaymentConfig();
+
+        // --- LENIS SMOOTH SCROLL INIT ---
+        const lenis = new Lenis({
+            autoRaf: true,
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+        });
+
+        // Sync Lenis with GSAP ScrollTrigger
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+
+        // --- GSAP ANIMATIONS ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 1. MatchMedia Animation Initialization
+        const mm = gsap.matchMedia();
+
+        mm.add("(min-width: 961px)", () => {
+            // -- DESKTOP CINEMATIC ANIMATIONS --
+
+            // 1. Hero Cinematic Reveal
+            const tl = gsap.timeline();
+            tl.fromTo(".hero-badge", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, ease: "power3.out", delay: 0.2 })
+                .fromTo(".hero h1 span", { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.15, ease: "power3.out" }, "-=0.6")
+                .fromTo(".hero h2, .hero p", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }, "-=0.6")
+                .fromTo(".hero-btns a", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }, "-=0.6")
+                .fromTo(".hero-visual", { scale: 0.9, autoAlpha: 0, clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
+                    { scale: 1, autoAlpha: 1, clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0% 100%)", duration: 1.2, ease: "power3.out" }, "-=1");
+
+            // 2. Mousemove Parallax on Hero
+            document.addEventListener("mousemove", (e) => {
+                const x = (e.clientX / window.innerWidth - 0.5) * 20;
+                const y = (e.clientY / window.innerHeight - 0.5) * 20;
+                gsap.to(".hero-main-img", { x: x * 2, y: y * 2, duration: 1, ease: "power2.out" });
+                gsap.to(".stat-chip.top-right", { x: x * -1.5, y: y * -1.5, duration: 1, ease: "power2.out" });
+                gsap.to(".stat-chip.bottom-left", { x: x * 3, y: y * 3, duration: 1, ease: "power2.out" });
+            });
+
+            // 3. Scroll Parallax Elements
+            gsap.to(".hero-left", { yPercent: 15, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+
+            document.querySelectorAll('.parallax-bg-orb').forEach(orb => {
+                const speed = parseFloat(orb.getAttribute('data-speed')) || 0.05;
+                gsap.to(orb, { y: () => (window.innerHeight * speed * 30), ease: "none", scrollTrigger: { trigger: orb.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
+            });
+
+            // 4. Marquee Smooth Sync
+            gsap.to(".marquee-track", {
+                xPercent: -50,
+                ease: "none",
+                scrollTrigger: { trigger: ".marquee-section", start: "top bottom", end: "bottom top", scrub: 1 }
+            });
+
+            // 5. Features Clip Reveal
+            gsap.fromTo("#features .feature-card",
+                { y: 50, autoAlpha: 0, clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
+                { y: 0, autoAlpha: 1, clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0% 100%)", duration: 1, stagger: 0.15, ease: "power3.out", scrollTrigger: { trigger: ".features-grid", start: "top 80%" } }
+            );
+
+            // 6. How it works (Pinned Horizontal Scroll)
+            gsap.fromTo("#how .how-title, #how .how-sub", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1, stagger: 0.1, ease: "power3.out", scrollTrigger: { trigger: "#how", start: "top 70%" } });
+
+            gsap.fromTo("#how .step-card",
+                { y: 50, autoAlpha: 0, clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
+                { y: 0, autoAlpha: 1, clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0% 100%)", duration: 1, stagger: 0.15, ease: "power3.out", scrollTrigger: { trigger: "#how", start: "top 70%" } }
+            );
+
+            const stepsWrapper = document.querySelector("#stepsTrack");
+            if (stepsWrapper) {
+                gsap.to(stepsWrapper, {
+                    x: () => -(stepsWrapper.scrollWidth - window.innerWidth + 24),
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: "#how",
+                        start: "center center",
+                        end: () => "+=" + (stepsWrapper.scrollWidth - window.innerWidth + 24),
+                        scrub: 1,
+                        pin: true,
+                        anticipatePin: 1
+                    }
+                });
+            }
+
+            // 7. Mission
+            gsap.fromTo(".mission-bg .mission", { y: 30, autoAlpha: 0, scale: 0.95 }, { y: 0, autoAlpha: 1, scale: 1, duration: 1.2, ease: "power3.out", scrollTrigger: { trigger: ".mission-bg", start: "top 75%" } });
+            gsap.fromTo(".mission-bg .mstat", { y: 30, autoAlpha: 0, scale: 0.95 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.8, stagger: 0.15, ease: "power3.out", scrollTrigger: { trigger: ".mission-stats", start: "top 85%" } });
+
+            // 8. CTA
+            gsap.fromTo(".cta-inner > *",
+                { y: 30, autoAlpha: 0, clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
+                { y: 0, autoAlpha: 1, clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0% 100%)", duration: 0.8, stagger: 0.1, ease: "power3.out", scrollTrigger: { trigger: ".cta-wrap", start: "top 80%" } }
+            );
+        });
+
+        mm.add("(max-width: 960px)", () => {
+            // -- MOBILE SIMPLIFIED ANIMATIONS (Performance) --
+            gsap.fromTo(".hero-badge", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, ease: "power2.out", delay: 0.1 });
+            gsap.fromTo(".hero h1 span, .hero h2, .hero p, .hero-btns a", { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.1, ease: "power2.out" });
+            gsap.fromTo(".hero-visual", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8, ease: "power2.out" });
+
+            gsap.to(".marquee-track", { xPercent: -50, ease: "none", scrollTrigger: { trigger: ".marquee-section", start: "top bottom", end: "bottom top", scrub: 1 } });
+
+            document.querySelectorAll('.parallax-bg-orb').forEach(orb => {
+                const speed = parseFloat(orb.getAttribute('data-speed')) || 0.05;
+                gsap.to(orb, { y: () => (window.innerHeight * speed * 10), ease: "none", scrollTrigger: { trigger: orb.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
+            });
+
+            gsap.utils.toArray(".reveal, .feature-card, .step-card, .cta-inner > *").forEach(el => {
+                gsap.fromTo(el, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 85%" } });
+            });
+        });
+
+    </script>
+    <!-- CHATBOT -->
+    <style>
+        .chatbot-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 16px;
+        }
+
+        .chatbot-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .chatbot-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 16px 48px rgba(74, 222, 128, 0.3);
+        }
+
+        .chatbot-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .chatbot-panel {
+            width: 340px;
+            height: 460px;
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            border-top: var(--glass-border-t);
+            box-shadow: var(--glass-shadow);
+            border-radius: var(--radius-xl);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s, transform 0.3s;
+            transform-origin: bottom right;
+        }
+
+        .chatbot-panel.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        .chatbot-header {
+            padding: 20px;
+            background: rgba(2, 44, 34, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chatbot-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chatbot-title .material-icons {
+            color: var(--lime);
+        }
+
+        .chatbot-close {
+            background: transparent;
+            border: none;
+            color: var(--white-70);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .chatbot-close:hover {
+            color: var(--white);
+        }
+
+        .chatbot-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-msg {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .chat-msg.bot {
+            background: var(--bg-secondary);
+            color: var(--white);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-msg.user {
+            background: var(--lime);
+            color: #0d1f12;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            font-weight: 500;
+        }
+
+        .chat-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .chat-option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--lime-border);
+            color: var(--lime);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.2s;
+        }
+
+        .chat-option-btn:hover {
+            background: var(--lime-muted);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <div class="chatbot-container">
+        <div class="chatbot-panel" id="chatbotPanel">
+            <div class="chatbot-header">
+                <div class="chatbot-title">
+                    <span class="material-icons">eco</span>
+                    SmartFeed Guide
+                </div>
+                <button class="chatbot-close" id="chatbotClose">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatbotBody">
+                <div class="chat-msg bot">
+                    Hello! I'm your SmartFeed assistant. How can I help you today?
+                    <div class="chat-options" id="initialOptions">
+                        <button class="chat-option-btn" onclick="handleChatOption('What is SmartFeed?')">What is
+                            SmartFeed?</button>
+                        <button class="chat-option-btn" onclick="handleChatOption('How does it work?')">How does it
+                            work?</button>
+                        <button class="chat-option-btn" onclick="handleChatOption('Pricing details')">Pricing
+                            details</button>
+                        <button class="chat-option-btn" onclick="handleChatOption('Contact Support')">Contact
+                            Support</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-btn" id="chatbotToggle">
+            <img src="chatbot_logo.png" alt="Chatbot" class="chatbot-logo" />
+        </div>
+    </div>
+
+    <script>
+        const chatbotPanel = document.getElementById('chatbotPanel');
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotBody = document.getElementById('chatbotBody');
+
+        chatbotToggle.addEventListener('click', () => {
+            chatbotPanel.classList.toggle('active');
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotPanel.classList.remove('active');
+        });
+
+        const botKnowledge = {
+            'What is SmartFeed?': "SmartFeed is a sustainability platform designed to minimize food waste by connecting surplus meals from mess owners with students.",
+            'How does it work?': "1. Mess owners log surplus food. 2. Students subscribe to affordable meal plans. 3. AI matches surplus with demand dynamically.",
+            'Pricing details': "We offer various flexible subscription packages tailored for college students to ensure nutritious meals without breaking the bank.",
+            'Contact Support': "You can reach our 24/7 support team via email at support@smartfeed.com or call our toll-free number 1-800-SMARTFD."
+        };
+
+        function handleChatOption(question) {
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-msg user';
+            userMsg.textContent = question;
+            chatbotBody.appendChild(userMsg);
+
+            const opts = document.getElementById('initialOptions');
+            if (opts) opts.style.display = 'none';
+
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chat-msg bot';
+                botMsg.textContent = botKnowledge[question] || "I don't have information on that yet.";
+                chatbotBody.appendChild(botMsg);
+
+                const moreOpts = document.createElement('div');
+                moreOpts.className = 'chat-options';
+                Object.keys(botKnowledge).forEach(k => {
+                    if (k !== question) {
+                        const btn = document.createElement('button');
+                        btn.className = 'chat-option-btn';
+                        btn.textContent = k;
+                        btn.onclick = () => handleChatOption(k);
+                        moreOpts.appendChild(btn);
+                    }
+                });
+                botMsg.appendChild(moreOpts);
+                chatbotBody.scrollTop = chatbotBody.scrollHeight;
+            }, 600);
+        }
     </script>
 </body>
 
