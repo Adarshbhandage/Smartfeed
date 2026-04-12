@@ -108,6 +108,17 @@ body{
   padding: 32px;
   margin-bottom: 24px;
 }
+
+.inner-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  transition: border-color 0.25s, transform 0.2s;
+}
+.inner-box:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
 .app-section { display: none; animation: fadeIn 0.3s ease; }
 .app-section.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -121,13 +132,6 @@ body{
 
 /* ── TOP STAT CARDS ── */
 .top-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
-.s-card{
-  background:var(--bg-card);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border); border-top: var(--glass-border-t);
-  box-shadow: var(--glass-shadow);
-  border-radius:var(--r-lg);padding:24px;
-}
 .s-card-label{
   display:flex;align-items:center;gap:6px;
   font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
@@ -152,11 +156,6 @@ body{
 
 /* ── IMPACT CARD ── */
 .impact-card{
-  background:var(--bg-card);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border); border-top: var(--glass-border-t);
-  box-shadow: var(--glass-shadow);
-  border-radius:var(--r-lg);padding:24px 28px;
   display:flex;align-items:center;justify-content:space-between;
   gap:20px;flex-wrap:wrap;margin-bottom:20px;
 }
@@ -182,13 +181,6 @@ body{
 
 /* ── CHART + FEED ── */
 .mid-row{display:grid;grid-template-columns:1fr 310px;gap:16px;margin-bottom:20px;}
-.chart-card,.feed-card{
-  background:var(--bg-card);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border); border-top: var(--glass-border-t);
-  box-shadow: var(--glass-shadow);
-  border-radius:var(--r-lg);padding:24px;
-}
 .card-title{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:4px;}
 .card-sub{font-size:0.78rem;color:var(--white-70);margin-bottom:20px;}
 
@@ -233,13 +225,6 @@ body{
 }
 
 /* ── TABLE ── */
-.table-card{
-  background:var(--bg-card);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border); border-top: var(--glass-border-t);
-  box-shadow: var(--glass-shadow);
-  border-radius:var(--r-lg);padding:24px;
-}
 .table-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
 .search-box{
   display:flex;align-items:center;gap:8px;
@@ -347,14 +332,15 @@ tr:hover td{background:rgba(241,248,238,0.02);}
   <main class="main">
     <div id="section-dashboard" class="app-section active">
     <!-- DASHBOARD SECTION -->
-    <div class="page-header">
+    <div class="glass-panel">
+    <div class="page-header" style="margin-bottom: 24px;">
       <h1>Mess Overview</h1>
       <p>Welcome back, Chief Steward. Here is your real-time impact and resource utilization for today.</p>
     </div>
 
     <!-- TOP STATS -->
     <div class="top-stats">
-      <div class="s-card">
+      <div class="s-card inner-box">
         <div class="s-card-label">
           <span class="material-icons">wb_twilight</span>
           Breakfast <span class="live-dot"></span><span class="live-text">LIVE</span>
@@ -366,7 +352,7 @@ tr:hover td{background:rgba(241,248,238,0.02);}
           <div class="s-bar-label" id="bLbl"></div>
         </div>
       </div>
-      <div class="s-card">
+      <div class="s-card inner-box">
         <div class="s-card-label">
           <span class="material-icons">sunny</span>
           Lunch <span class="live-dot"></span><span class="live-text">LIVE</span>
@@ -378,7 +364,7 @@ tr:hover td{background:rgba(241,248,238,0.02);}
           <div class="s-bar-label" id="lLbl"></div>
         </div>
       </div>
-      <div class="s-card">
+      <div class="s-card inner-box">
         <div class="s-card-label">
           <span class="material-icons">dark_mode</span>
           Dinner <span class="live-dot"></span><span class="live-text">LIVE</span>
@@ -393,7 +379,7 @@ tr:hover td{background:rgba(241,248,238,0.02);}
     </div>
 
     <!-- IMPACT -->
-    <div class="impact-card">
+    <div class="impact-card inner-box">
       <div class="impact-left">
         <div class="impact-tag"><span class="material-icons">eco</span>Impact Total</div>
         <div class="impact-num" id="impactNum">—</div>
@@ -404,7 +390,7 @@ tr:hover td{background:rgba(241,248,238,0.02);}
 
     <!-- CHART + FEED -->
     <div class="mid-row">
-      <div class="chart-card">
+      <div class="chart-card inner-box">
         <div class="card-title">This Week's Attendance Trends</div>
         <div class="card-sub">Historical meal participation rates</div>
         <div class="chart-area" id="chartArea"></div>
@@ -414,7 +400,7 @@ tr:hover td{background:rgba(241,248,238,0.02);}
         </div>
       </div>
 
-      <div class="feed-card">
+      <div class="feed-card inner-box">
         <div class="feed-header">
           <div class="card-title">Recent Activity</div>
           <div class="feed-live"><span class="live-dot"></span>LIVE FEED</div>
@@ -424,7 +410,7 @@ tr:hover td{background:rgba(241,248,238,0.02);}
     </div>
 
     <!-- TABLE -->
-    <div class="table-card">
+    <div class="table-card inner-box">
       <div class="table-header">
         <div>
           <div class="card-title">Daily Log</div>
@@ -451,15 +437,17 @@ tr:hover td{background:rgba(241,248,238,0.02);}
         </table>
       </div>
     </div>
+    </div> <!-- END glass-panel-->
     </div> <!-- END DASHBOARD SECTION -->
 
     <!-- INVENTORY SECTION -->
     <div id="section-inventory" class="app-section">
-      <div class="page-header glass-panel">
+      <div class="glass-panel">
+      <div class="page-header" style="margin-bottom: 24px;">
         <h1>Inventory Management</h1>
         <p>Current stock levels and requirements based on upcoming meals.</p>
       </div>
-      <div class="table-card">
+      <div class="table-card inner-box">
         <div class="table-header">
           <div class="card-title">Stock Status</div>
         </div>
@@ -476,40 +464,44 @@ tr:hover td{background:rgba(241,248,238,0.02);}
         </table>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- ANALYTICS SECTION -->
     <div id="section-analytics" class="app-section">
-      <div class="page-header glass-panel">
+      <div class="glass-panel">
+      <div class="page-header" style="margin-bottom: 24px;">
         <h1>Detailed Analytics</h1>
         <p>Insights into mess attendance, food waste reduction, and savings.</p>
       </div>
       <div class="top-stats">
-        <div class="s-card">
+        <div class="s-card inner-box">
           <div class="s-card-label"><span class="material-icons">trending_down</span> Waste Reduction</div>
           <div class="s-num">38%</div>
           <div class="s-denom">Less food wasted vs last month</div>
         </div>
-        <div class="s-card">
+        <div class="s-card inner-box">
           <div class="s-card-label"><span class="material-icons">savings</span> Savings (Estimated)</div>
           <div class="s-num">₹14k</div>
           <div class="s-denom">Saved on groceries this week</div>
         </div>
-        <div class="s-card">
+        <div class="s-card inner-box">
           <div class="s-card-label"><span class="material-icons">done_all</span> Accuracy</div>
           <div class="s-num">94%</div>
           <div class="s-denom">Attendance prediction accuracy</div>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- STUDENTS SECTION -->
     <div id="section-students" class="app-section">
-      <div class="page-header glass-panel">
+      <div class="glass-panel">
+      <div class="page-header" style="margin-bottom: 24px;">
         <h1>Student Directory</h1>
         <p>Manage hostel residents and their mess subscriptions.</p>
       </div>
-      <div class="table-card">
+      <div class="table-card inner-box">
         <div class="tbl-wrap">
         <table>
           <thead><tr><th>Student Name</th><th>Hostel/Room No.</th><th>Subscription Status</th></tr></thead>
@@ -522,15 +514,17 @@ tr:hover td{background:rgba(241,248,238,0.02);}
         </table>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- NOTIFICATIONS SECTION -->
     <div id="section-notifications" class="app-section">
-      <div class="page-header glass-panel">
+      <div class="glass-panel">
+      <div class="page-header" style="margin-bottom: 24px;">
         <h1>Notifications</h1>
         <p>Alerts and updates regarding mess operations.</p>
       </div>
-      <div class="table-card">
+      <div class="table-card inner-box">
         <div style="padding:16px; border-bottom:1px solid rgba(255, 255, 255, 0.15);">
           <div style="color:var(--clay);font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:1rem">warning</span> Action Required</div>
           <div style="color:var(--white-70)">Stock alert: Cooking oil is running low. Expected to run out by tomorrow evening.</div>
@@ -540,15 +534,17 @@ tr:hover td{background:rgba(241,248,238,0.02);}
           <div style="color:var(--white-70)">New feature: Students can now cancel meals up to 2 hours before service. Let them know!</div>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- SETTINGS SECTION -->
     <div id="section-settings" class="app-section">
-      <div class="page-header glass-panel">
+      <div class="glass-panel">
+      <div class="page-header" style="margin-bottom: 24px;">
         <h1>Mess Settings</h1>
         <p>Configure meal timings and cutoff rules.</p>
       </div>
-      <div class="table-card">
+      <div class="table-card inner-box">
         <h3 style="margin-bottom:10px;">Meal Timings</h3>
         <p style="color:var(--white-70);margin-bottom:20px;line-height:1.8;">
           <strong>Breakfast:</strong> 7:30 AM - 9:30 AM <br/> 
@@ -556,6 +552,7 @@ tr:hover td{background:rgba(241,248,238,0.02);}
           <strong>Dinner:</strong> 7:30 PM - 9:30 PM
         </p>
         <button class="impact-btn"><span class="material-icons">edit</span>Edit Timings</button>
+      </div>
       </div>
     </div>
 
@@ -749,7 +746,7 @@ async function deleteStudent(id, name) {
 
 // ── Add "Add Student" button to the students section ──────────────
 function patchStudentsSection() {
-  const hdr = document.querySelector('#section-students .page-header.glass-panel');
+  const hdr = document.querySelector('#section-students .page-header');
   if (hdr) {
     const btn = document.createElement('button');
     btn.onclick = openAddModal;

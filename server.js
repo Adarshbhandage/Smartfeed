@@ -16,6 +16,8 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
+const fs = require('fs');
 
 // Route groups
 const authRoutes     = require('./routes/authRoutes');
@@ -55,6 +57,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const frontendDir = path.resolve(process.env.FRONTEND_DIR || path.join(__dirname, '..', 'frontend'));
+const hasFrontend = fs.existsSync(path.join(frontendDir, 'index.html'));
+
 // ──────────────────────────────────────────────
 //  Health Check Route (no auth required)
 // ──────────────────────────────────────────────
@@ -79,10 +84,27 @@ app.use('/api/approval', approvalRoutes);  // /api/approval/*
 app.use('/api/students', studentRoutes);   // /api/students/*
 app.use('/api/menu',     menuRoutes);      // /api/menu/*
 
+if (hasFrontend) {
+  app.use(express.static(frontendDir));
+
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(frontendDir, 'index.html'));
+  });
+}
+
 // ──────────────────────────────────────────────
 //  404 Handler for unknown routes
 // ──────────────────────────────────────────────
 app.use((req, res) => {
+  if (
+    hasFrontend &&
+    req.method === 'GET' &&
+    !req.originalUrl.startsWith('/api/') &&
+    !path.extname(req.path)
+  ) {
+    return res.sendFile(path.join(frontendDir, 'index.html'));
+  }
+
   res.status(404).json({
     success: false,
     message: `Route ${req.method} ${req.originalUrl} not found`,
