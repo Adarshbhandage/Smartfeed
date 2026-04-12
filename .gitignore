@@ -1,6 +1,6 @@
-node_modules/
+trash/
+backup_old/
+backend/node_modules/
+backend/.env
 .env
-config/serviceAccountKey.json
-*.log
-.DS_Store
-dist/
+package-lock.json
