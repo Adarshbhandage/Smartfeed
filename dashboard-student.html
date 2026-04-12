@@ -72,6 +72,17 @@ body {
   margin-bottom: 24px;
 }
 
+.inner-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  transition: border-color 0.25s, transform 0.2s;
+}
+.inner-box:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 /* NAV */
 .nav {
   position: sticky; top: 0; z-index: 200;
@@ -128,16 +139,14 @@ body {
 }
 .week-strip::-webkit-scrollbar { display: none; }
 .week-day {
-  min-width: 52px; height: 74px;
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border);
-  border-top: var(--glass-border-t);
+  min-width: 54px; height: 76px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--r-md);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   cursor: pointer; flex-shrink: 0; transition: border-color 0.2s, background 0.2s;
 }
-.week-day:hover { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
+.week-day:hover { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.08); }
 .week-day.today {
   background: var(--lime-muted); border-color: var(--lime);
 }
@@ -160,17 +169,10 @@ body {
 
 /* MEAL CARD */
 .meal-card {
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border);
-  border-top: var(--glass-border-t);
-  box-shadow: var(--glass-shadow);
-  border-radius: var(--r-lg);
-  padding: 20px; display: flex; flex-direction: column;
-  transition: border-color 0.25s, transform 0.2s;
   min-height: 280px;
+  display: flex; flex-direction: column;
 }
-.meal-card:hover { border-color: var(--lime-border); }
+.meal-card:hover { border-color: var(--lime-border); transform: translateY(-3px); }
 .meal-emoji { font-size: 1.8rem; margin-bottom: 10px; }
 .meal-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
 .meal-time { font-size: 0.78rem; color: var(--white-70); margin-bottom: 12px; line-height: 1.4; }
@@ -202,14 +204,9 @@ body {
 .cutoff-tag .material-icons { font-size: 0.75rem; }
 
 /* BOTTOM ROW */
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
 .b-card {
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border);
-  border-top: var(--glass-border-t);
-  box-shadow: var(--glass-shadow);
-  border-radius: var(--r-lg); padding: 24px;
+  display: flex; flex-direction: column;
 }
 .b-card-title {
   font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
@@ -291,19 +288,21 @@ body {
 </header>
 
 <div class="main">
-  <div class="glass-panel">
-    <div class="date-tag" id="dateTag"></div>
-    <div class="greeting">Good morning, Adarsh 👋 — What's your plan for today?</div>
+  <div class="glass-panel main-panel">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; margin-bottom: 24px;">
+      <div>
+        <div class="date-tag" id="dateTag"></div>
+        <div class="greeting">Good morning, Adarsh 👋 — What's your plan for today?</div>
+      </div>
+      <!-- WEEK STRIP -->
+      <div class="week-strip" id="weekStrip" style="margin-bottom: 0;"></div>
+    </div>
 
-    <!-- WEEK STRIP -->
-    <div class="week-strip" id="weekStrip" style="margin-bottom: 0;"></div>
-  </div>
-
-  <!-- MEALS -->
-  <div class="meals-heading">Today's Meals</div>
+    <!-- MEALS -->
+    <div class="meals-heading">Today's Meals</div>
   <div class="meals-grid">
 
-    <div class="meal-card" id="card-b">
+    <div class="meal-card inner-box" id="card-b">
       <div class="meal-emoji">🍳</div>
       <div class="meal-name">Breakfast</div>
       <div class="meal-time">7:30 AM — Scrambled Eggs &amp; Toast</div>
@@ -316,7 +315,7 @@ body {
       <div class="cutoff-tag"><span class="material-icons">schedule</span>Mark by 9:00 PM tonight · Finalizing soon</div>
     </div>
 
-    <div class="meal-card" id="card-l">
+    <div class="meal-card inner-box" id="card-l">
       <div class="meal-emoji">🍲</div>
       <div class="meal-name">Lunch</div>
       <div class="meal-time">1:00 PM — Vegetable Biryani</div>
@@ -329,7 +328,7 @@ body {
       <div class="cutoff-tag"><span class="material-icons">schedule</span>Mark by 9:00 PM tonight · Finalizing soon</div>
     </div>
 
-    <div class="meal-card" id="card-d">
+    <div class="meal-card inner-box" id="card-d">
       <div class="meal-emoji">🥗</div>
       <div class="meal-name">Dinner</div>
       <div class="meal-time">8:00 PM — Grilled Chicken &amp; Salad</div>
@@ -346,18 +345,18 @@ body {
 
   <!-- BOTTOM CARDS -->
   <div class="bottom-grid">
-    <div class="b-card">
+    <div class="b-card inner-box">
       <div class="b-card-title"><span class="material-icons">local_fire_department</span> My Streak</div>
       <div class="streak-num">12</div>
       <div class="streak-days">Days</div>
       <div class="impact-pill"><span class="material-icons">eco</span> Your meal data is helping reduce waste on campus.</div>
-      <div style="margin-top:16px">
+      <div style="margin-top:auto; padding-top: 20px;">
         <div class="prog-track"><div class="prog-fill" id="sfBar"></div></div>
         <div class="prog-hint">3 more days to reach Platinum level</div>
       </div>
     </div>
 
-    <div class="b-card">
+    <div class="b-card inner-box">
       <div class="b-card-title"><span class="material-icons">restaurant</span> Chef's Update</div>
       <img class="chef-photo"
         src="chef_3d_icon.png" style="filter:none; object-fit:contain; object-position:bottom;"
@@ -366,7 +365,8 @@ body {
       <div class="chef-quote">"Thanks for the head's up, Adarsh! Knowing who's skipping helps us prep the right amount. Every mark makes a difference."</div>
     </div>
   </div>
-</div>
+  </div> <!-- END .glass-panel main-panel -->
+</div> <!-- END .main -->
 
 <!-- TAB BAR -->
 <nav class="tab-bar">

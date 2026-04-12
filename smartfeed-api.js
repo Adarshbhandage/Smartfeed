@@ -225,6 +225,14 @@
   };
 
   const payment = {
+    getOwnerConfig() {
+      return request('GET', '/payment/owner-config', { auth: false });
+    },
+
+    confirmOwnerRegistration(data) {
+      return request('POST', '/payment/owner-confirmation', { auth: false, body: data });
+    },
+
     createOrder() {
       return request('POST', '/payment/create-order', { auth: false });
     },
@@ -338,6 +346,10 @@
 
     getMeals(studentId) {
       return request('GET', `/students/${studentId}/meals`);
+    },
+
+    sendDailyReminders() {
+      return request('POST', '/students/reminders/daily');
     },
   };
 
